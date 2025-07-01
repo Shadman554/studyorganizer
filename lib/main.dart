@@ -978,6 +978,18 @@ class _MyAppState extends State<MyApp> {
 }
 
 // --- Placeholder/Model Classes & Pages ---
+// Enum for identifying pages/drawer items
+enum AppPage {
+  home,
+  dashboard,
+  studyTimer,
+  studyCalendar,
+  flashcards,
+  backupRestore, // For the ExpansionTile itself, if needed, or handle sub-items separately
+  settings,
+  aboutMe,
+}
+
 // Keep Lecture, PDFLecture classes as they are.
 // Keep HomePage, AddLecturePage, LectureDetailPage, SettingsPage, AnalysisPage as they are.
 // ... (Your existing code for these classes)
@@ -2332,6 +2344,7 @@ class _HomePageState extends State<HomePage> {
   final String _lecturesKey = 'lectures';
   String _sortBy = 'name';
   bool _isDark = true;
+  AppPage _currentPage = AppPage.home; // Track current page
 
   @override
   void initState() {
@@ -2342,6 +2355,70 @@ class _HomePageState extends State<HomePage> {
       await updateWidgets(null);
       await updateHomeScreenWidget(null);
     });
+  }
+
+  void _navigateToPage(AppPage page) {
+    Navigator.pop(context); // Close drawer
+    if (_currentPage == page && page != AppPage.home) { // Avoid re-navigating to same page unless it's home for a refresh
+        // If it's already the current page (and not home), do nothing or maybe refresh
+        return;
+    }
+
+    setState(() {
+      _currentPage = page;
+    });
+
+    switch (page) {
+      case AppPage.home:
+        // Already on home or navigate to home (often means rebuilding current page)
+        // If HomePage is complex, you might want a more specific refresh
+        if (ModalRoute.of(context)?.settings.name != '/') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(
+                prefs: widget.prefs,
+                settings: widget.settings,
+                onSettingsChanged: widget.onSettingsChanged,
+              ),
+              settings: const RouteSettings(name: '/'), // Optional: for route tracking
+            ),
+          );
+        }
+        break;
+      case AppPage.dashboard:
+        Navigator.push(context, MaterialPageRoute(builder: (_) => AnalysisPage(lectures: lectures))).then((_) => setState(() => _currentPage = AppPage.home));
+        break;
+      case AppPage.studyTimer:
+        Navigator.push(context, MaterialPageRoute(builder: (_) => StudyTimerPage())).then((_) => setState(() => _currentPage = AppPage.home));
+        break;
+      case AppPage.studyCalendar:
+        Navigator.push(context, MaterialPageRoute(builder: (_) => StudyCalendarPage())).then((_) => setState(() => _currentPage = AppPage.home));
+        break;
+      case AppPage.flashcards:
+        Navigator.push(context, MaterialPageRoute(builder: (_) => FlashcardsPage())).then((_) => setState(() => _currentPage = AppPage.home));
+        break;
+      case AppPage.settings:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SettingsPage(
+              settings: widget.settings,
+              onSettingsChanged: widget.onSettingsChanged,
+            ),
+          ),
+        ).then((_) {
+          _loadLectures(); // Reload lectures in case settings affect them
+          setState(() => _currentPage = AppPage.home);
+        });
+        break;
+      case AppPage.aboutMe:
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutMePage())).then((_) => setState(() => _currentPage = AppPage.home));
+        break;
+      case AppPage.backupRestore:
+        // This is an ExpansionTile, selection handled differently or not at all for the tile itself
+        break;
+    }
   }
 
   @override
@@ -3843,9 +3920,34 @@ class _HomePageState extends State<HomePage> {
   }
 
 
+  Widget _buildDrawerSectionHeader(BuildContext context, String title) {
+    return Padding(
+      // Increased top padding for more separation
+      padding: const EdgeInsets.only(left: 16.0, top: 20.0, bottom: 8.0, right: 16.0),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 13, // Slightly larger for better readability
+          fontWeight: FontWeight.w600, // Medium bold
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.85), // More vibrant
+          letterSpacing: 0.3,
+        ),
+      ),
+    );
+  }
+
   Widget _buildDrawerItem(
-      BuildContext context, IconData icon, String title, VoidCallback onTap) {
+      BuildContext context, IconData icon, String title, VoidCallback onTap, {bool selected = false}) {
+    final theme = Theme.of(context);
     return ListTile(
+      leading: Icon(icon, color: selected ? theme.colorScheme.primary : theme.textTheme.bodyLarge?.color?.withOpacity(0.7)),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: selected ? theme.colorScheme.primary : theme.textTheme.bodyLarge?.color,
+          fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
       leading: Icon(icon),
       title: Text(title),
       onTap: onTap,
@@ -3883,98 +3985,131 @@ class _HomePageState extends State<HomePage> {
             child: ListView(
               padding: EdgeInsets.zero,
               children: <Widget>[
-                UserAccountsDrawerHeader(
-                  // Use UserAccountsDrawerHeader
-                  accountName: const Text(
-                    'WANAKANM',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  accountEmail: const Text('Your Study Companion'),
-                  currentAccountPicture: CircleAvatar(
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    child: Icon(
-                      Icons.school_outlined, // Study icon
-                      size: 40,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
+                DrawerHeader(
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primary,
                   ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          Image.asset(
+                            'assets/icons/logo.png', // Assuming this is the correct path
+                            height: 40,
+                            width: 40,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            'WANAKANM',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Your Study Companion',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.8),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                _buildDrawerItem(context, Icons.home_outlined, 'Home',
-                    () => Navigator.pop(context)),
-                _buildDrawerItem(context, Icons.analytics_outlined, 'Analysis',
-                    () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => AnalysisPage(lectures: lectures)));
-                }),
-                const Divider(),
-                _buildDrawerItem(context, Icons.timer_outlined, 'Study Timer',
-                    () {
-                  Navigator.pop(context);
-                  // *** FIX: Removed const ***
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => StudyTimerPage()));
-                }),
+                // --- Main Section ---
+                _buildDrawerSectionHeader(context, 'MAIN'),
                 _buildDrawerItem(
-                    context, Icons.calendar_today_outlined, 'Study Calendar',
-                    () {
-                  Navigator.pop(context);
-                  // *** FIX: Removed const ***
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => StudyCalendarPage()));
-                }),
-                _buildDrawerItem(context, Icons.style_outlined, 'Flashcards',
-                    () {
-                  Navigator.pop(context);
-                  // *** FIX: Removed const ***
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => FlashcardsPage()));
-                }),
-                const Divider(),
-                ExpansionTile(
-                  leading: const Icon(Icons.backup_outlined),
-                  title: const Text('Backup & Restore'),
-                  children: <Widget>[
+                  context,
+                  Icons.home_outlined,
+                  'Home',
+                  () => _navigateToPage(AppPage.home),
+                  selected: _currentPage == AppPage.home,
+                ),
+
+                // --- Study Tools Section ---
+                _buildDrawerSectionHeader(context, 'STUDY TOOLS'),
+                _buildDrawerItem(
+                  context,
+                  Icons.analytics_outlined,
+                  'Dashboard',
+                  () => _navigateToPage(AppPage.dashboard),
+                  selected: _currentPage == AppPage.dashboard,
+                ),
+                _buildDrawerItem(
+                  context,
+                  Icons.timer_outlined,
+                  'Study Timer',
+                  () => _navigateToPage(AppPage.studyTimer),
+                  selected: _currentPage == AppPage.studyTimer,
+                ),
+                _buildDrawerItem(
+                  context,
+                  Icons.calendar_today_outlined,
+                  'Study Calendar',
+                  () => _navigateToPage(AppPage.studyCalendar),
+                  selected: _currentPage == AppPage.studyCalendar,
+                ),
+                _buildDrawerItem(
+                  context,
+                  Icons.style_outlined,
+                  'Flashcards',
+                  () => _navigateToPage(AppPage.flashcards),
+                  selected: _currentPage == AppPage.flashcards,
+                ),
+
+                // --- Data Management Section ---
+                _buildDrawerSectionHeader(context, 'DATA MANAGEMENT'),
+                Theme( // Wrap ExpansionTile in a Theme to override divider color
+                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                  child: ExpansionTile(
+                    leading: Icon(Icons.backup_outlined, color: Theme.of(context).iconTheme.color ?? Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.7)),
+                    title: Text(
+                      'Backup & Restore',
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.bodyLarge!.color,
+                        fontSize: 14.5, // Consistent with _buildDrawerItem
+                       ),
+                    ),
+                    tilePadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 2.0), // Consistent with _buildDrawerItem
+                    childrenPadding: const EdgeInsets.only(left: 0), // Let sub-items handle their own padding
+                    // Optionally, manage 'selected' state for ExpansionTile if needed
+                    // selected: _currentPage == AppPage.backupRestore, // Would require handling this state
+                    children: <Widget>[
                     _buildDrawerSubItem(
                         context, Icons.save_alt_outlined, 'Create Backup', () {
-                      Navigator.pop(context);
+                      Navigator.pop(context); // Close drawer first
                       _createBackup();
                     }),
                     _buildDrawerSubItem(
                         context, Icons.restore_outlined, 'Restore Backup', () {
-                      Navigator.pop(context);
+                      Navigator.pop(context); // Close drawer first
                       _restoreBackup();
                     }),
                   ],
                 ),
-                const Divider(),
-                _buildDrawerItem(context, Icons.settings_outlined, 'Settings',
-                    () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => SettingsPage(
-                              settings: widget.settings,
-                              onSettingsChanged: widget.onSettingsChanged,
-                            ),
-                          ))
-                      .then((_) =>
-                          _loadLectures()); // Reload in case settings affect home page
-                }),
-                _buildDrawerItem(context, Icons.person_outline, 'About Me',
-                    () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AboutMePage()),
-                  );
-                }),
+
+                // --- App Section ---
+                _buildDrawerSectionHeader(context, 'APP'),
+                _buildDrawerItem(
+                  context,
+                  Icons.settings_outlined,
+                  'Settings',
+                  () => _navigateToPage(AppPage.settings),
+                  selected: _currentPage == AppPage.settings,
+                ),
+                _buildDrawerItem(
+                  context,
+                  Icons.person_outline,
+                  'About Me',
+                  () => _navigateToPage(AppPage.aboutMe),
+                  selected: _currentPage == AppPage.aboutMe,
+                ),
               ],
             ),
           ),
