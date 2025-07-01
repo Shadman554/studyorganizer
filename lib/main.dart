@@ -423,13 +423,13 @@ Future<bool> _checkNotificationPermissions() async {
     } else {
       print('✅ SCHEDULE_EXACT_ALARM permission is already granted.');
     }
-    
+
     // 3. Check for battery optimization exemption - critical for reliable notifications
     bool isBatteryOptimizationExempt = false;
     try {
       isBatteryOptimizationExempt = await Permission.ignoreBatteryOptimizations.isGranted;
       print('Battery optimization exemption status: $isBatteryOptimizationExempt');
-      
+
       if (!isBatteryOptimizationExempt) {
         print('Requesting battery optimization exemption...');
         await Permission.ignoreBatteryOptimizations.request();
@@ -451,27 +451,27 @@ Future<bool> _checkNotificationPermissions() async {
 Future<void> scheduleReminderNotification(
     AppSettings settings, List<Lecture> lectures, bool remindersEnabled) async {
   print('Scheduling reminder notification with settings: ${settings.reminderTime.hour}:${settings.reminderTime.minute}');
-  
+
   try {
     // Cancel any existing reminders first
     await flutterLocalNotificationsPlugin.cancelAll();
-    
+
     // If reminders are disabled, just exit after canceling
     if (!remindersEnabled || !settings.remindersEnabled) {
       print('Reminders are disabled. Not scheduling any notifications.');
       return;
     }
-    
+
     // Check permissions
     final hasPermission = await _checkNotificationPermissions();
     if (!hasPermission) {
       print('Insufficient permissions to schedule reminder notifications');
       return;
     }
-    
+
     // Get the timezone location
     final location = tz.getLocation(timeZoneName ?? 'UTC');
-    
+
     // Calculate when to show the notification
     final now = tz.TZDateTime.now(location);
     var scheduledDate = tz.TZDateTime(
@@ -482,21 +482,21 @@ Future<void> scheduleReminderNotification(
       settings.reminderTime.hour,
       settings.reminderTime.minute,
     );
-    
+
     // If the time has already passed today, schedule for tomorrow
     if (scheduledDate.isBefore(now)) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
-    
+
     print('Scheduling notification for: $scheduledDate');
-    
+
     // Count incomplete lectures for notification content
     int incompleteCount = 0;
     for (var lecture in lectures) {
       incompleteCount += lecture.theoryLectures.where((l) => !l.isCompleted).length;
       incompleteCount += lecture.practicalLectures.where((l) => !l.isCompleted).length;
     }
-    
+
     // Create the notification details
     const androidDetails = AndroidNotificationDetails(
       'study_reminders',
@@ -512,9 +512,9 @@ Future<void> scheduleReminderNotification(
       category: AndroidNotificationCategory.alarm,
       fullScreenIntent: true,
     );
-    
+
     const notificationDetails = NotificationDetails(android: androidDetails);
-    
+
     // Schedule the notification
     await flutterLocalNotificationsPlugin.zonedSchedule(
       0, // ID for the daily reminder
@@ -530,7 +530,7 @@ Future<void> scheduleReminderNotification(
       matchDateTimeComponents: DateTimeComponents.time, // Daily at the same time
       payload: 'daily_reminder',
     );
-    
+
     print('Successfully scheduled notification for ${settings.reminderTime.hour}:${settings.reminderTime.minute}');
   } catch (e, stackTrace) {
     print('Error scheduling reminder notification: $e');
@@ -710,7 +710,7 @@ Future<void> sendTestNotification() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   tz.initializeTimeZones();
-  
+
   // Set preferred frame rate to 120 FPS - only after Flutter is initialized
   if (Platform.isAndroid) {
     try {
@@ -725,7 +725,7 @@ void main() async {
       print('Error setting device orientation: $e');
     }
   }
-  
+
   // Get device timezone using timezone package
   try {
     // Get the local timezone from the system
@@ -735,15 +735,15 @@ void main() async {
     final int offsetHours = offset.inHours;
     final int offsetMinutes = (offset.inMinutes % 60).abs();
     final String sign = offset.isNegative ? '-' : '+';
-    
+
     // Format as UTC+X or UTC-X
     final String formattedOffset = 'UTC$sign${offsetHours.abs().toString().padLeft(2, '0')}:${offsetMinutes.toString().padLeft(2, '0')}';
     print('Device timezone offset: $formattedOffset');
-    
+
     // Try to find a timezone with this offset
     final availableTimezones = tz.timeZoneDatabase.locations.keys.toList();
     bool found = false;
-    
+
     // First try to find a timezone with the exact same offset
     for (final tzName in availableTimezones) {
       final location = tz.getLocation(tzName);
@@ -755,17 +755,17 @@ void main() async {
         break;
       }
     }
-    
+
     // If no exact match, use UTC
     if (!found) {
-      timeZoneName = 'UTC';
+      timeZoneName = 'UTC'; // Fallback to UTC if we can't determine the timezone
       print('No matching timezone found, using UTC');
     }
   } catch (e) {
     print('Error determining timezone: $e');
     timeZoneName = 'UTC'; // Fallback to UTC if we can't determine the timezone
   }
-  
+
   final location = tz.getLocation(timeZoneName ?? 'UTC');
   tz.setLocalLocation(location); // Set default timezone for the app
 
@@ -783,14 +783,14 @@ void main() async {
     statuses.forEach((permission, status) {
       print('$permission status: $status');
     });
-    
+
     // For Android 11+ (API level 30+), we might need to request additional permissions
     try {
       // Check if we need to request manage external storage permission
       // This permission is only needed on Android 11+ (API 30+)
       var manageStatus = await Permission.manageExternalStorage.status;
       print('Permission.manageExternalStorage initial status: $manageStatus');
-      
+
       if (manageStatus.isDenied) {
         manageStatus = await Permission.manageExternalStorage.request();
         print('Permission.manageExternalStorage status after request: $manageStatus');
@@ -859,16 +859,16 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     // Get the selected font family
     final String fontFamily = _getFontFamily();
-    
+
     // Create text theme with the selected font
     final TextTheme darkTextTheme = fontFamily.isEmpty
         ? ThemeData.dark().textTheme
         : ThemeData.dark().textTheme.apply(fontFamily: fontFamily);
-        
+
     final TextTheme lightTextTheme = fontFamily.isEmpty
         ? ThemeData.light().textTheme
         : ThemeData.light().textTheme.apply(fontFamily: fontFamily);
-    
+
     return MaterialApp(
       title: 'Wanakanm',
       theme: settings.isDarkMode
@@ -1086,14 +1086,14 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   // Local state to track dark mode setting
   late bool _isDarkMode;
-  
+
   @override
   void initState() {
     super.initState();
     // Initialize local state from widget settings
     _isDarkMode = widget.settings.isDarkMode;
   }
-  
+
   @override
   void didUpdateWidget(SettingsPage oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -1337,7 +1337,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
-  
+
   // Show font selection dialog
   void _showFontSelectionDialog(BuildContext context) {
     showDialog(
@@ -1647,7 +1647,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ? 'You will be reminded every ${widget.settings.intervalHours} hours about your incomplete lectures.'
                       : 'You will be reminded daily at ${widget.settings.reminderTime.format(context)} about your incomplete lectures.',
                 ),
-                
+
                 // Test notification button
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -1674,10 +1674,10 @@ class _SettingsPageState extends State<SettingsPage> {
                         );
                         return;
                       }
-                      
+
                       // Send test notification
                       await sendTestNotification();
-                      
+
                       if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -1980,7 +1980,7 @@ class AnalysisPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       decoration: BoxDecoration(
-        color: theme.cardTheme.color ?? theme.cardColor,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -2181,7 +2181,7 @@ class AnalysisPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       decoration: BoxDecoration(
-          color: theme.cardTheme.color ?? theme.cardColor,
+          color: Theme.of(context).brightness == Brightness.light ? Colors.white : theme.cardColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -2253,7 +2253,7 @@ class _SubjectProgressTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-          color: theme.cardTheme.color ?? theme.cardColor,
+          color: Theme.of(context).brightness == Brightness.light ? Colors.white : theme.cardColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -2270,8 +2270,8 @@ class _SubjectProgressTile extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(title,
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w600)),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600)),
               ),
               Text(
                 "${(progress * 100).toStringAsFixed(0)}%",
@@ -2533,38 +2533,11 @@ class _HomePageState extends State<HomePage> {
     _saveLectures();
   }
 
-  Widget _buildProgressRow(
-      String title, double value, int completed, int total) {
-    return Row(
-      children: [
-        SizedBox(
-          width: 80, // Consistent label width
-          child:
-              Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-        ),
-        Expanded(
-          child: ClipRRect(
-            // Rounded corners for progress bar
-            borderRadius: BorderRadius.circular(10),
-            child: LinearProgressIndicator(
-              value: value,
-              minHeight: 10, // Make it thicker
-              backgroundColor: Theme.of(context)
-                  .colorScheme
-                  .surfaceVariant, // Use theme color
-              valueColor: AlwaysStoppedAnimation<Color>(
-                  Theme.of(context).colorScheme.primary),
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Text('$completed/$total (${(value * 100).toInt()}%)',
-            style: const TextStyle(fontSize: 12)),
-      ],
-    );
-  }
 
   Widget _buildAnalyticsSummary() {
+    final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
+    
     int totalTheory = 0;
     int completedTheory = 0;
     int totalPractical = 0;
@@ -2579,61 +2552,231 @@ class _HomePageState extends State<HomePage> {
           lecture.practicalLectures.where((l) => l.isCompleted).length;
     }
 
-    double totalProgress = (totalTheory + totalPractical) == 0
-        ? 0
-        : (completedTheory + completedPractical) /
-            (totalTheory + totalPractical);
+    final totalProgress = (totalTheory + totalPractical) > 0
+        ? (completedTheory + completedPractical) / (totalTheory + totalPractical)
+        : 0.0;
+    final theoryProgress =
+        totalTheory > 0 ? completedTheory / totalTheory : 0.0;
+    final practicalProgress =
+        totalPractical > 0 ? completedPractical / totalPractical : 0.0;
 
-    double theoryProgress =
-        totalTheory == 0 ? 0 : completedTheory / totalTheory;
-    double practicalProgress =
-        totalPractical == 0 ? 0 : completedPractical / totalPractical;
-
-    return Card(
-      margin: const EdgeInsets.only(
-          bottom: 16, left: 8, right: 8, top: 8), // Added horizontal margins
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Progress Overview',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color:
-                    Theme.of(context).colorScheme.primary, // Use primary color
-              ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      constraints: const BoxConstraints(
+        minWidth: double.infinity,
+      ),
+      child: Material(
+        elevation: 0,
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: theme.colorScheme.outline.withOpacity(0.1),
+              width: 1,
             ),
-            const SizedBox(height: 16),
-            _buildProgressRow(
-                'Overall',
-                totalProgress,
-                (completedTheory + completedPractical),
-                (totalTheory + totalPractical)),
-            const SizedBox(height: 12),
-            _buildProgressRow(
-                'Theory', theoryProgress, completedTheory, totalTheory),
-            const SizedBox(height: 12),
-            _buildProgressRow('Practical', practicalProgress,
-                completedPractical, totalPractical),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => AnalysisPage(lectures: lectures)),
-                  );
-                },
-                child: const Text('View Details →'),
+            boxShadow: [
+              BoxShadow(
+                color: primaryColor.withOpacity(0.1),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
-            )
-          ],
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header with overall stats
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Overall Progress',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${completedTheory + completedPractical} of ${totalTheory + totalPractical} completed',
+                        style: theme.textTheme.titleSmall
+                            ?.copyWith(color: theme.hintColor),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    width: 80,
+                    height: 80,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          value: totalProgress,
+                          backgroundColor: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            totalProgress >= 0.8 ? Colors.green : primaryColor,
+                          ),
+                          strokeWidth: 8,
+                          strokeCap: StrokeCap.round,
+                        ),
+                        Text(
+                          '${(totalProgress * 100).toInt()}%',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Progress breakdown cards
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildProgressCard(
+                      'Theory',
+                      completedTheory,
+                      totalTheory,
+                      theoryProgress,
+                      const Color(0xFF3B82F6),
+                      Icons.menu_book_outlined,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildProgressCard(
+                      'Practical',
+                      completedPractical,
+                      totalPractical,
+                      practicalProgress,
+                      const Color(0xFFF59E0B),
+                      Icons.science_outlined,
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Action button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => AnalysisPage(lectures: lectures)),
+                    );
+                  },
+                  icon: const Icon(Icons.analytics_outlined, size: 20),
+                  label: const Text('Detailed Analytics'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildProgressCard(String title, int completed, int total, double progress, Color color, IconData icon) {
+    final theme = Theme.of(context);
+    
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outline.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: color, size: 18),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            '$completed',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          Text(
+            'of $total completed',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withOpacity(0.6),
+            ),
+          ),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: LinearProgressIndicator(
+              value: progress,
+              backgroundColor: color.withOpacity(0.15),
+              valueColor: AlwaysStoppedAnimation<Color>(color),
+              minHeight: 8,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '${(progress * 100).toInt()}% complete',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -2961,147 +3104,178 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
       drawer: _buildDrawer(context),
-      appBar: AppBar(
-        title: const Text('WANAKANM'),
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              setState(() {
-                _sortBy = value;
-                _sortLectures();
-              });
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'name',
-                child: Text('Sort by Name'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'date',
-                child: Text('Sort by Date Added'),
-              ),
-            ],
-            icon: const Icon(Icons.sort),
-            tooltip: "Sort Lectures",
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            title: Text('WANAKANM'),
+            pinned: true,
+            elevation: 0,
+            scrolledUnderElevation: 4.0,
+            surfaceTintColor: theme.colorScheme.surface,
+            shadowColor: theme.shadowColor.withOpacity(0.1),
           ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: lectures.isEmpty
-          ? Center(
+          // Quick Access Tools Section
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.school_outlined,
-                      size: 80, color: Colors.grey[600]),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No Lectures Yet',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: Colors.grey[700],
+                  const SizedBox(height: 40),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withOpacity(0.1),
+                          shape: BoxShape.circle,
                         ),
+                        child: Icon(
+                          Icons.psychology_outlined,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Study Tools',
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Tap the + button to add your first lecture!',
-                    style: TextStyle(color: Colors.grey[600]),
+                  const SizedBox(height: 10),
+                  _buildStudyToolsGrid(context),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
+          ),
+          // Progress Overview
+          if (lectures.isNotEmpty)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4, bottom: 12),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.trending_up,
+                              color: theme.colorScheme.primary,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Your Progress',
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    _buildAnalyticsSummary(),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ),
+          // Lectures Section
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.menu_book,
+                          color: theme.colorScheme.primary,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'My Lectures',
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  PopupMenuButton<String>(
+                    onSelected: (value) {
+                      setState(() {
+                        _sortBy = value;
+                        _sortLectures();
+                      });
+                    },
+                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                      const PopupMenuItem<String>(
+                        value: 'name',
+                        child: Text('Sort by Name'),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'date',
+                        child: Text('Sort by Date Added'),
+                      ),
+                    ],
+                    icon: Icon(Icons.sort, color: theme.colorScheme.primary),
+                    tooltip: "Sort Lectures",
                   ),
                 ],
               ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(8), // Add padding
-              itemCount: lectures.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return _buildAnalyticsSummary();
-                }
-                final lecture = lectures[index - 1];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 4.0, horizontal: 8.0), // Use consistent padding
-                  child: Card(
-                    // Card theme will handle styling
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LectureDetailPage(
-                              lecture: lecture,
-                              onAddTheory: addTheoryLecture,
-                              onAddPractical: addPracticalLecture,
-                              onUpdateTheory: updateTheoryLecture,
-                              onUpdatePractical: updatePracticalLecture,
-                              onDeleteTheory: deleteTheoryLecture,
-                              onDeletePractical: deletePracticalLecture,
-                            ),
-                          ),
-                        ).then((_) => _loadLectures()); // Reload on return
+            ),
+          ),
+          // Lectures List or Empty State
+          lectures.isEmpty
+              ? SliverToBoxAdapter(
+                  child: _buildEmptyLecturesState(context),
+                )
+              : SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final lecture = lectures[index];
+                        return _buildModernLectureCard(lecture);
                       },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12.0, horizontal: 16.0),
-                        child: Row(
-                          // Use Row for better layout
-                          children: [
-                            _buildLectureProgress(
-                                lecture), // Move progress to left
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    lecture.name,
-                                    style: const TextStyle(
-                                      fontSize: 18, // Slightly smaller
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  if (lecture.subtitle.isNotEmpty)
-                                    Text(
-                                      lecture.subtitle,
-                                      style: TextStyle(
-                                          color: Colors.grey[600],
-                                          fontSize: 12), // Smaller subtitle
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  if (lecture.classroom.isNotEmpty)
-                                    Text(
-                                      lecture.classroom,
-                                      style: TextStyle(
-                                          color: Colors.grey[600],
-                                          fontSize: 12), // Smaller classroom
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              // Keep menu button
-                              icon: const Icon(Icons.more_vert),
-                              onPressed: () => _showLectureOptions(
-                                  context, lecture), // Updated action
-                              tooltip: "More Options",
-                            ),
-                          ],
-                        ),
-                      ),
+                      childCount: lectures.length,
                     ),
                   ),
-                );
-              },
-            ),
-      floatingActionButton: FloatingActionButton(
+                ),
+          // Bottom spacing for FAB
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 100),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.push(
             context,
@@ -3110,8 +3284,11 @@ class _HomePageState extends State<HomePage> {
             ),
           );
         },
+        icon: const Icon(Icons.add),
+        label: const Text('Add Lecture'),
         tooltip: 'Add New Lecture',
-        child: const Icon(Icons.add),
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
       ),
     );
   }
@@ -3229,46 +3406,442 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildLectureProgress(Lecture lecture) {
-    int totalTheory = lecture.theoryLectures.length;
-    int completedTheory =
-        lecture.theoryLectures.where((l) => l.isCompleted).length;
-    int totalPractical = lecture.practicalLectures.length;
-    int completedPractical =
-        lecture.practicalLectures.where((l) => l.isCompleted).length;
+  Widget _buildStudyToolsGrid(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    int crossAxisCount = (width ~/ 170).clamp(2, 4);
 
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: crossAxisCount,
+      crossAxisSpacing: 16,
+      mainAxisSpacing: 16,
+      childAspectRatio: 1.1,
+      children: [
+        _buildToolCard(
+          context: context,
+          title: 'AI Study Tools',
+          subtitle: 'Generate summaries & quizzes',
+          icon: Icons.psychology,
+          gradient: [Colors.purple, Colors.deepPurple],
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => AIToolsPage(
+                text: 'Welcome to AI Study Tools',
+                performAiAction: (text, action, {questionCount, quizType, difficulty}) {},
+                lectureId: '',
+                lectureName: 'General',
+              )),
+            );
+          },
+        ),
+        _buildToolCard(
+          context: context,
+          title: 'Flashcards',
+          subtitle: 'Practice with smart cards',
+          icon: Icons.style,
+          gradient: [Colors.orange, Colors.deepOrange],
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => FlashcardsPage()),
+            );
+          },
+        ),
+        _buildToolCard(
+          context: context,
+          title: 'Study Calendar',
+          subtitle: 'Schedule & track events',
+          icon: Icons.calendar_today,
+          gradient: [Colors.blue, Colors.indigo],
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => StudyCalendarPage()),
+            );
+          },
+        ),
+        _buildToolCard(
+          context: context,
+          title: 'Study Timer',
+          subtitle: 'Focus with Pomodoro',
+          icon: Icons.timer,
+          gradient: [Colors.green, Colors.teal],
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => StudyTimerPage()),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildToolCard({
+    required BuildContext context,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required List<Color> gradient,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      borderRadius: BorderRadius.circular(20),
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: onTap,
+        splashColor: Colors.white.withOpacity(0.2),
+        highlightColor: Colors.white.withOpacity(0.05),
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: gradient,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: gradient.last.withOpacity(0.35),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.15),
+                  ),
+                  padding: const EdgeInsets.all(14),
+                  child: Icon(icon, color: Colors.white, size: 30),
+                ),
+                const Spacer(),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyLecturesState(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: theme.colorScheme.outline.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.school_outlined,
+              size: 48,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'No Lectures Yet',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Start by adding your first lecture to begin organizing your study materials',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withOpacity(0.7),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          FilledButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddLecturePage(onAdd: addLecture),
+                ),
+              );
+            },
+            icon: const Icon(Icons.add),
+            label: const Text('Add Your First Lecture'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModernLectureCard(Lecture lecture) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
+    
+    int totalTheory = lecture.theoryLectures.length;
+    int completedTheory = lecture.theoryLectures.where((l) => l.isCompleted).length;
+    int totalPractical = lecture.practicalLectures.length;
+    int completedPractical = lecture.practicalLectures.where((l) => l.isCompleted).length;
     int total = totalTheory + totalPractical;
     int completed = completedTheory + completedPractical;
-
     double progress = total == 0 ? 0 : completed / total;
 
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        SizedBox(
-          height: 50, // Slightly larger
-          width: 50,
-          child: CircularProgressIndicator(
-            value: progress,
-            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              progress == 1.0
-                  ? Colors.green
-                  : Theme.of(context).colorScheme.primary,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Material(
+        elevation: 0,
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LectureDetailPage(
+                  lecture: lecture,
+                  onAddTheory: addTheoryLecture,
+                  onAddPractical: addPracticalLecture,
+                  onUpdateTheory: updateTheoryLecture,
+                  onUpdatePractical: updatePracticalLecture,
+                  onDeleteTheory: deleteTheoryLecture,
+                  onDeletePractical: deletePracticalLecture,
+                ),
+              ),
+            ).then((_) => _loadLectures());
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: theme.colorScheme.outline.withOpacity(0.1),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: primaryColor.withOpacity(0.1),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            strokeWidth: 5, // Thicker
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            lecture.name,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          if (lecture.subtitle.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              lecture.subtitle,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                              ),
+                            ),
+                          ],
+                          if (lecture.classroom.isNotEmpty) ...[
+                            const SizedBox(height: 2),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on,
+                                  size: 16,
+                                  color: theme.colorScheme.primary,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  lecture.classroom,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    Column(
+                      children: [
+                        SizedBox(
+                          width: 60,
+                          height: 60,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              CircularProgressIndicator(
+                                value: progress,
+                                backgroundColor: theme.colorScheme.surfaceVariant,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  progress == 1.0 ? Colors.green : theme.colorScheme.primary,
+                                ),
+                                strokeWidth: 6,
+                              ),
+                              Text(
+                                '${(progress * 100).toInt()}%',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        PopupMenuButton<String>(
+                          icon: Icon(
+                            Icons.more_vert,
+                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          ),
+                          onSelected: (value) => _showLectureOptions(context, lecture),
+                          itemBuilder: (context) => [
+                            const PopupMenuItem(
+                              value: 'edit',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.edit),
+                                  SizedBox(width: 8),
+                                  Text('Edit'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'delete',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete, color: Colors.red),
+                                  SizedBox(width: 8),
+                                  Text('Delete', style: TextStyle(color: Colors.red)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildMiniProgressBar(
+                        'Theory',
+                        completedTheory,
+                        totalTheory,
+                        const Color(0xFF3B82F6), // Same blue as progress cards
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildMiniProgressBar(
+                        'Practical',
+                        completedPractical,
+                        totalPractical,
+                        const Color(0xFFF59E0B), // Same yellow/orange as progress cards
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMiniProgressBar(String label, int completed, int total, Color color) {
+    final theme = Theme.of(context);
+    final progress = total == 0 ? 0.0 : completed / total;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '$completed',
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: color,
+            fontSize: 20,
           ),
         ),
         Text(
-          '${(progress * 100).toInt()}%', // Show percentage
-          style: const TextStyle(
-            fontSize: 12, // Larger text
-            fontWeight: FontWeight.bold,
+          'of $total completed',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurface.withOpacity(0.6),
+          ),
+        ),
+        const SizedBox(height: 12),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: LinearProgressIndicator(
+            value: progress,
+            backgroundColor: color.withOpacity(0.15),
+            valueColor: AlwaysStoppedAnimation<Color>(color),
+            minHeight: 8,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '${(progress * 100).toInt()}% complete',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: color,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ],
     );
   }
+
 
   Widget _buildDrawerItem(
       BuildContext context, IconData icon, String title, VoidCallback onTap) {
@@ -3873,11 +4446,11 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
     String title = '';
     List<Map<String, String>>? flashcards;
     Map<String, String>? studyGuide;
-    
+
     // Ensure non-null values for parameters
     final int nonNullQuestionCount = questionCount ?? 10;
     final String nonNullQuizType = quizType ?? 'mixed';
-    
+
     // Use the quiz type directly now that we have a separate difficulty parameter
     String baseQuizType = nonNullQuizType;
     String difficultyLevel = difficulty ?? 'medium';
@@ -3934,7 +4507,7 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
         case 'flashcards':
           title = 'Flashcards';
           flashcards = await _aiService.generateFlashcards(pdfText, count: nonNullQuestionCount);
-          
+
           // Add PDF name to each flashcard
           if (flashcards != null && pdfName != null) {
             for (var card in flashcards) {
@@ -3978,7 +4551,7 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
             content: studyGuide, // Removed null assertion operator
           );
           await studyGuideService.saveStudyGuide(newGuide);
-          
+
           // Navigate to the study guide page
           if (mounted) {
             Navigator.push(
@@ -3994,15 +4567,15 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
       } else if (action == 'questions' && result != null) {
         // Process questions differently for multiple choice vs other types
         List<String> questions = [];
-        
+
         if (baseQuizType == 'multiple_choice' || baseQuizType == 'mixed') {
           // For multiple choice, we need to include the options with each question
           final lines = result.split('\n');
           List<String> currentQuestion = [];
-          
+
           for (int i = 0; i < lines.length; i++) {
             final line = lines[i].trim();
-            
+
             // Start of a new question
             if (line.startsWith('Q: ')) {
               // If we have a previous question, add it to the list
@@ -4032,7 +4605,7 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
               }
             }
           }
-          
+
           // Add the last question if there is one
           if (currentQuestion.isNotEmpty) {
             questions.add(currentQuestion.join('\n'));
@@ -4086,7 +4659,7 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
       }
     }
   }
-  
+
   // Show a preview dialog with the option to proceed or cancel
 
   void _showResultDialog(String title, String content) {
@@ -4325,9 +4898,9 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Theme.of(context).colorScheme.primary.withOpacity(0.5), width: 1.5),
+        side: BorderSide.none,
       ),
-      color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+      color: Theme.of(context).colorScheme.surface,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () => _pickAndSavePDF(isTheory),
