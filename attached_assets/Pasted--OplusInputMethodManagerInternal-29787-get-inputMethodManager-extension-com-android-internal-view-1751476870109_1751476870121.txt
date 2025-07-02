@@ -1,0 +1,92 @@
+/OplusInputMethodManagerInternal(29787): get inputMethodManager extension: com.android.internal.view.IInputMethodManager$Stub$Proxy@1660b25
+D/ViewRootImplExtImpl(29787): the up motion event handled by client, just return
+D/ProfileInstaller(29787): Installing profile for com.example.wanakanm
+V/AutofillManager(29787): requestHideFillUi(null): anchor = null
+D/ViewRootImplExtImpl(29787): the up motion event handled by client, just return
+V/AutofillManager(29787): requestHideFillUi(null): anchor = null
+D/ViewRootImplExtImpl(29787): the up motion event handled by client, just return
+W/WindowOnBackDispatcher(29787): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher(29787): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+V/AutofillManager(29787): requestHideFillUi(null): anchor = null
+I/VelocityTracker(29787): LSQ2 speed rezero
+D/ViewRootImplExtImpl(29787): the up motion event handled by client, just return
+V/AutofillManager(29787): requestHideFillUi(null): anchor = null
+D/ViewRootImplExtImpl(29787): the up motion event handled by client, just return
+D/CompatChangeReporter(29787): Compat change id reported: 312399441; UID 10717; state: ENABLED
+I/flutter (29787): Error opening PDF: done
+D/callGcSupression(29787): java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[])' on a null object reference
+D/ScrollOptim [SceneManager](29787): updateCurrentActivity: mCurrentActivityName=null, isOptEnable=true, isAnimAheadEnable=true, isFrameInsertEnable=true, InsertNum=1, isEnabledForScrollChanged=false
+D/VRI[MainActivity](29787): onFocusEvent false
+D/ColorModeChangeItem(29787): preExecute mColorMode=0
+D/callGcSupression(29787): java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[])' on a null object reference
+D/ScrollOptim [SceneManager](29787): updateCurrentActivity: mCurrentActivityName=com.example.wanakanm.MainActivity, isOptEnable=true, isAnimAheadEnable=true, isFrameInsertEnable=true, InsertNum=1, isEnabledForScrollChanged=false
+D/ActivityThread(29787): ComponentInfo{com.example.wanakanm/com.example.wanakanm.MainActivity} checkFinished=false 4
+D/ResourcesManagerExtImpl(29787): applyConfigurationToAppResourcesLocked app.getDisplayId() return callback.displayId:0
+D/VRI[MainActivity](29787): onFocusEvent true
+V/AutofillManager(29787): requestHideFillUi(null): anchor = null
+D/ViewRootImplExtImpl(29787): the up motion event handled by client, just return
+D/callGcSupression(29787): java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[])' on a null object reference
+D/ScrollOptim [SceneManager](29787): updateCurrentActivity: mCurrentActivityName=null, isOptEnable=true, isAnimAheadEnable=true, isFrameInsertEnable=true, InsertNum=1, isEnabledForScrollChanged=false
+D/VRI[MainActivity](29787): onFocusEvent false
+D/ColorModeChangeItem(29787): preExecute mColorMode=0
+D/callGcSupression(29787): java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[])' on a null object reference
+D/ScrollOptim [SceneManager](29787): updateCurrentActivity: mCurrentActivityName=com.example.wanakanm.MainActivity, isOptEnable=true, isAnimAheadEnable=true, isFrameInsertEnable=true, InsertNum=1, isEnabledForScrollChanged=false
+D/ActivityThread(29787): ComponentInfo{com.example.wanakanm/com.example.wanakanm.MainActivity} checkFinished=false 4
+D/ResourcesManagerExtImpl(29787): applyConfigurationToAppResourcesLocked app.getDisplayId() return callback.displayId:0
+2
+D/permissions_handler(29787): No permissions found in manifest for: []22
+D/VRI[MainActivity](29787): onFocusEvent true
+D/OplusScrollToTopManager(29787): com.example.wanakanm/com.example.wanakanm.MainActivity,This com.android.internal.policy.DecorView{13239ad V.E...... R....... 0,0-1080,2412 aid=0 alpha=1.0 viewInfo = }[MainActivity] change focus to true
+V/AutofillManager(29787): requestHideFillUi(null): anchor = null
+D/ViewRootImplExtImpl(29787): the up motion event handled by client, just return
+D/callGcSupression(29787): java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[])' on a null object reference
+D/ScrollOptim [SceneManager](29787): updateCurrentActivity: mCurrentActivityName=null, isOptEnable=true, isAnimAheadEnable=true, isFrameInsertEnable=true, InsertNum=1, isEnabledForScrollChanged=false
+D/VRI[MainActivity](29787): onFocusEvent false
+D/ColorModeChangeItem(29787): preExecute mColorMode=0
+D/callGcSupression(29787): java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[])' on a null object reference
+D/ScrollOptim [SceneManager](29787): updateCurrentActivity: mCurrentActivityName=com.example.wanakanm.MainActivity, isOptEnable=true, isAnimAheadEnable=true, isFrameInsertEnable=true, InsertNum=1, isEnabledForScrollChanged=false
+D/ActivityThread(29787): ComponentInfo{com.example.wanakanm/com.example.wanakanm.MainActivity} checkFinished=false 4
+D/ResourcesManagerExtImpl(29787): applyConfigurationToAppResourcesLocked app.getDisplayId() return callback.displayId:0
+2
+D/permissions_handler(29787): No permissions found in manifest for: []22
+D/VRI[MainActivity](29787): onFocusEvent true
+V/AutofillManager(29787): requestHideFillUi(null): anchor = null
+D/ViewRootImplExtImpl(29787): the up motion event handled by client, just return
+D/callGcSupression(29787): java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[])' on a null object reference
+D/ScrollOptim [SceneManager](29787): updateCurrentActivity: mCurrentActivityName=null, isOptEnable=true, isAnimAheadEnable=true, isFrameInsertEnable=true, InsertNum=1, isEnabledForScrollChanged=false
+D/VRI[MainActivity](29787): onFocusEvent false
+V/AutofillManager(29787): requestHideFillUi(null): anchor = null
+D/ColorModeChangeItem(29787): preExecute mColorMode=0
+D/callGcSupression(29787): java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[])' on a null object reference
+D/ScrollOptim [SceneManager](29787): updateCurrentActivity: mCurrentActivityName=com.example.wanakanm.MainActivity, isOptEnable=true, isAnimAheadEnable=true, isFrameInsertEnable=true, InsertNum=1, isEnabledForScrollChanged=false
+D/ActivityThread(29787): ComponentInfo{com.example.wanakanm/com.example.wanakanm.MainActivity} checkFinished=false 4
+D/ResourcesManagerExtImpl(29787): applyConfigurationToAppResourcesLocked app.getDisplayId() return callback.displayId:0
+2
+D/permissions_handler(29787): No permissions found in manifest for: []22
+D/VRI[MainActivity](29787): onFocusEvent true
+D/ViewRootImplExtImpl(29787): the up motion event handled by client, just return
+D/callGcSupression(29787): java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[])' on a null object reference
+D/ScrollOptim [SceneManager](29787): updateCurrentActivity: mCurrentActivityName=null, isOptEnable=true, isAnimAheadEnable=true, isFrameInsertEnable=true, InsertNum=1, isEnabledForScrollChanged=false
+D/VRI[MainActivity](29787): onFocusEvent false
+D/ColorModeChangeItem(29787): preExecute mColorMode=0
+D/callGcSupression(29787): java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[])' on a null object reference
+D/ScrollOptim [SceneManager](29787): updateCurrentActivity: mCurrentActivityName=com.example.wanakanm.MainActivity, isOptEnable=true, isAnimAheadEnable=true, isFrameInsertEnable=true, InsertNum=1, isEnabledForScrollChanged=false
+D/ActivityThread(29787): ComponentInfo{com.example.wanakanm/com.example.wanakanm.MainActivity} checkFinished=false 4
+D/ResourcesManagerExtImpl(29787): applyConfigurationToAppResourcesLocked app.getDisplayId() return callback.displayId:0
+2
+D/permissions_handler(29787): No permissions found in manifest for: []22
+D/VRI[MainActivity](29787): onFocusEvent true
+V/AutofillManager(29787): requestHideFillUi(null): anchor = null
+D/ViewRootImplExtImpl(29787): the up motion event handled by client, just return
+D/callGcSupression(29787): java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[])' on a null object reference
+D/ScrollOptim [SceneManager](29787): updateCurrentActivity: mCurrentActivityName=null, isOptEnable=true, isAnimAheadEnable=true, isFrameInsertEnable=true, InsertNum=1, isEnabledForScrollChanged=false
+D/VRI[MainActivity](29787): onFocusEvent false
+D/ColorModeChangeItem(29787): preExecute mColorMode=0
+D/callGcSupression(29787): java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[])' on a null object reference
+D/ScrollOptim [SceneManager](29787): updateCurrentActivity: mCurrentActivityName=com.example.wanakanm.MainActivity, isOptEnable=true, isAnimAheadEnable=true, isFrameInsertEnable=true, InsertNum=1, isEnabledForScrollChanged=false
+D/ActivityThread(29787): ComponentInfo{com.example.wanakanm/com.example.wanakanm.MainActivity} checkFinished=false 4
+D/ResourcesManagerExtImpl(29787): applyConfigurationToAppResourcesLocked app.getDisplayId() return callback.displayId:0
+2
+D/permissions_handler(29787): No permissions found in manifest for: []22
+D/VRI[MainActivity](29787): onFocusEvent true
+D/OplusScrollToTopManager(29787): com.example.wanakanm/com.example.wanakanm.MainActivity,This com.android.internal.policy.DecorView{13239ad V.E...... R....... 0,0-1080,2412 aid=0 alpha=1.0 viewInfo = }[MainActivity] change focus to true
