@@ -4850,6 +4850,260 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
     );
   }
 
+  Widget _buildSimpleStatCard(String title, String count, IconData icon, Color color, double progress) {
+    final theme = Theme.of(context);
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            count,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 8),
+          LinearProgressIndicator(
+            value: progress,
+            backgroundColor: color.withOpacity(0.2),
+            valueColor: AlwaysStoppedAnimation<Color>(color),
+            minHeight: 4,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSimpleSectionHeader(String title, IconData icon, Color color) {
+    final theme = Theme.of(context);
+    
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          title,
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSimplePDFCard(PDFLecture pdf, bool isTheory, Color color) {
+    final theme = Theme.of(context);
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: pdf.isCompleted 
+              ? Colors.green.withOpacity(0.3)
+              : theme.colorScheme.outline.withOpacity(0.1),
+        ),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(16),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: (pdf.isCompleted ? Colors.green : color).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            Icons.picture_as_pdf,
+            color: pdf.isCompleted ? Colors.green : color,
+            size: 24,
+          ),
+        ),
+        title: Text(
+          pdf.name,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            decoration: pdf.isCompleted ? TextDecoration.lineThrough : null,
+          ),
+        ),
+        subtitle: Text(
+          pdf.isCompleted ? 'Completed' : 'Not completed',
+          style: TextStyle(
+            color: pdf.isCompleted ? Colors.green : theme.colorScheme.onSurface.withOpacity(0.6),
+            fontSize: 12,
+          ),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              onPressed: () => _toggleCompletion(pdf),
+              icon: Icon(
+                pdf.isCompleted ? Icons.check_circle : Icons.circle_outlined,
+                color: pdf.isCompleted ? Colors.green : Colors.grey,
+              ),
+              tooltip: pdf.isCompleted ? 'Mark as incomplete' : 'Mark as complete',
+            ),
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                switch (value) {
+                  case 'open':
+                    _openPDF(pdf.pdfPath);
+                    break;
+                  case 'ai':
+                    _showAiOptions(context, pdf.pdfPath);
+                    break;
+                  case 'delete':
+                    _showDeleteConfirmation(pdf, isTheory);
+                    break;
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'open',
+                  child: Row(
+                    children: [
+                      Icon(Icons.open_in_new),
+                      SizedBox(width: 8),
+                      Text('Open PDF'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'ai',
+                  child: Row(
+                    children: [
+                      Icon(Icons.psychology, color: Colors.purple),
+                      SizedBox(width: 8),
+                      Text('AI Tools'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete, color: Colors.red),
+                      SizedBox(width: 8),
+                      Text('Delete', style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        onTap: () => _openPDF(pdf.pdfPath),
+      ),
+    );
+  }
+
+  Widget _buildSimpleAddButton(bool isTheory, Color color) {
+    final theme = Theme.of(context);
+    
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: OutlinedButton.icon(
+        onPressed: () => _pickAndSavePDF(isTheory),
+        icon: Icon(Icons.add, color: color),
+        label: Text(
+          'Add ${isTheory ? "Theory" : "Practical"} PDF',
+          style: TextStyle(color: color),
+        ),
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.all(16),
+          side: BorderSide(color: color.withOpacity(0.3)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(String title, String subtitle, bool isTheory) {
+    final theme = Theme.of(context);
+    final color = isTheory ? Colors.blue : Colors.orange;
+    
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.outline.withOpacity(0.1),
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.picture_as_pdf_outlined,
+              size: 32,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            subtitle,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withOpacity(0.6),
+            ),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: () => _pickAndSavePDF(isTheory),
+            icon: const Icon(Icons.add),
+            label: const Text('Add PDF'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: color,
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildOverallProgressCard(
     double overallProgress,
     int completedLectures,
@@ -5091,222 +5345,173 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
     final overallProgress = totalLectures == 0 ? 0.0 : completedLectures / totalLectures;
 
     return Scaffold(
+      backgroundColor: theme.colorScheme.background,
+      appBar: AppBar(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.lecture.name,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            if (widget.lecture.subtitle.isNotEmpty)
+              Text(
+                widget.lecture.subtitle,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                ),
+              ),
+          ],
+        ),
+        backgroundColor: theme.colorScheme.surface,
+        elevation: 0,
+        scrolledUnderElevation: 1,
+        centerTitle: false,
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: overallProgress >= 0.8 ? Colors.green.withOpacity(0.1) : theme.colorScheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  overallProgress >= 0.8 ? Icons.check_circle : Icons.analytics,
+                  size: 16,
+                  color: overallProgress >= 0.8 ? Colors.green : theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '${(overallProgress * 100).toInt()}%',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: overallProgress >= 0.8 ? Colors.green : theme.colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
       body: Stack(
         children: [
-          CustomScrollView(
-            slivers: [
-              // Enhanced App Bar with lecture info
-              SliverAppBar(
-                expandedHeight: 200.0,
-                pinned: true,
-                elevation: 0,
-                scrolledUnderElevation: 4.0,
-                surfaceTintColor: theme.colorScheme.surface,
-                flexibleSpace: FlexibleSpaceBar(
-                  title: Text(
-                    widget.lecture.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      shadows: [
-                        Shadow(
-                          offset: Offset(0, 1),
-                          blurRadius: 3.0,
-                          color: Colors.black26,
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Quick Stats Card
+                if (totalLectures > 0) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: theme.colorScheme.outline.withOpacity(0.1),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Progress Overview',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildSimpleStatCard(
+                                'Theory',
+                                '$completedTheory/$totalTheory',
+                                Icons.menu_book_outlined,
+                                Colors.blue,
+                                totalTheory == 0 ? 0 : completedTheory / totalTheory,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildSimpleStatCard(
+                                'Practical',
+                                '$completedPractical/$totalPractical',
+                                Icons.science_outlined,
+                                Colors.orange,
+                                totalPractical == 0 ? 0 : completedPractical / totalPractical,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                  background: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          theme.colorScheme.primary,
-                          theme.colorScheme.primary.withOpacity(0.8),
-                        ],
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 80, 16, 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          if (widget.lecture.subtitle.isNotEmpty)
-                            Text(
-                              widget.lecture.subtitle,
-                              style: TextStyle(
-                                color: theme.colorScheme.onPrimary.withOpacity(0.9),
-                                fontSize: 14,
-                              ),
-                            ),
-                          if (widget.lecture.classroom.isNotEmpty) ...[
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.location_on,
-                                  size: 16,
-                                  color: theme.colorScheme.onPrimary.withOpacity(0.9),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  widget.lecture.classroom,
-                                  style: TextStyle(
-                                    color: theme.colorScheme.onPrimary.withOpacity(0.9),
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              
-              // Overall Progress Card
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: _buildOverallProgressCard(
-                    overallProgress,
-                    completedLectures,
-                    totalLectures,
-                    completedTheory,
-                    totalTheory,
-                    completedPractical,
-                    totalPractical,
-                  ),
-                ),
-              ),
+                  const SizedBox(height: 24),
+                ],
 
-              // Theory Section
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: _buildSectionHeader(
-                    'Theory Lectures',
-                    Icons.menu_book_outlined,
-                    completedTheory,
-                    totalTheory,
-                    const Color(0xFF3B82F6),
+                // Theory Section
+                _buildSimpleSectionHeader('Theory Materials', Icons.menu_book_outlined, Colors.blue),
+                const SizedBox(height: 12),
+                if (widget.lecture.theoryLectures.isEmpty)
+                  _buildEmptyState('No theory materials yet', 'Add your first theory PDF', true)
+                else ...[
+                  ...widget.lecture.theoryLectures.map((pdf) => 
+                    _buildSimplePDFCard(pdf, true, Colors.blue)
                   ),
-                ),
-              ),
-              
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                sliver: SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 0.85,
-                  ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      if (index == widget.lecture.theoryLectures.length) {
-                        return _buildEnhancedAddButton(true);
-                      }
-                      return _buildEnhancedPDFCard(widget.lecture.theoryLectures[index], true);
-                    },
-                    childCount: widget.lecture.theoryLectures.length + 1,
-                  ),
-                ),
-              ),
+                  const SizedBox(height: 8),
+                  _buildSimpleAddButton(true, Colors.blue),
+                ],
 
-              // Practical Section
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
-                  child: _buildSectionHeader(
-                    'Practical Lectures',
-                    Icons.science_outlined,
-                    completedPractical,
-                    totalPractical,
-                    const Color(0xFFF59E0B),
-                  ),
-                ),
-              ),
-              
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                sliver: SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 0.85,
-                  ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      if (index == widget.lecture.practicalLectures.length) {
-                        return _buildEnhancedAddButton(false);
-                      }
-                      return _buildEnhancedPDFCard(widget.lecture.practicalLectures[index], false);
-                    },
-                    childCount: widget.lecture.practicalLectures.length + 1,
-                  ),
-                ),
-              ),
+                const SizedBox(height: 32),
 
-              // Bottom spacing
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 32),
-              ),
-            ],
+                // Practical Section
+                _buildSimpleSectionHeader('Practical Materials', Icons.science_outlined, Colors.orange),
+                const SizedBox(height: 12),
+                if (widget.lecture.practicalLectures.isEmpty)
+                  _buildEmptyState('No practical materials yet', 'Add your first practical PDF', false)
+                else ...[
+                  ...widget.lecture.practicalLectures.map((pdf) => 
+                    _buildSimplePDFCard(pdf, false, Colors.orange)
+                  ),
+                  const SizedBox(height: 8),
+                  _buildSimpleAddButton(false, Colors.orange),
+                ],
+
+                const SizedBox(height: 32),
+              ],
+            ),
           ),
           
-          // Enhanced Loading Overlay
+          // Loading Overlay
           if (_isProcessingAi)
             Container(
-              color: theme.brightness == Brightness.dark
-                  ? Colors.black.withOpacity(0.7)
-                  : Colors.white.withOpacity(0.7),
+              color: Colors.black54,
               child: Center(
                 child: Container(
                   padding: const EdgeInsets.all(32),
-                  margin: const EdgeInsets.symmetric(horizontal: 32),
+                  margin: const EdgeInsets.all(32),
                   decoration: BoxDecoration(
-                    color: theme.cardColor,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 20,
-                        spreadRadius: 2,
-                      )
-                    ],
+                    color: theme.colorScheme.surface,
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 3,
-                          valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 16),
                       Text(
-                        "AI is thinking...",
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        "Please wait while we process your request",
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.7),
-                        ),
-                        textAlign: TextAlign.center,
+                        'AI is processing...',
+                        style: theme.textTheme.titleMedium,
                       ),
                     ],
                   ),
