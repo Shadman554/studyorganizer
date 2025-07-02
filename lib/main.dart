@@ -4930,38 +4930,37 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
               : theme.colorScheme.outline.withOpacity(0.1),
         ),
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: (pdf.isCompleted ? Colors.green : color).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            Icons.picture_as_pdf,
-            color: pdf.isCompleted ? Colors.green : color,
-            size: 24,
-          ),
-        ),
-        title: Text(
-          pdf.name,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            decoration: pdf.isCompleted ? TextDecoration.lineThrough : null,
-          ),
-        ),
-        subtitle: Text(
-          pdf.isCompleted ? 'Completed' : 'Not completed',
-          style: TextStyle(
-            color: pdf.isCompleted ? Colors.green : theme.colorScheme.onSurface.withOpacity(0.6),
-            fontSize: 12,
-          ),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
+      child: Column(
+        children: [
+          ListTile(
+            contentPadding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: (pdf.isCompleted ? Colors.green : color).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.picture_as_pdf,
+                color: pdf.isCompleted ? Colors.green : color,
+                size: 24,
+              ),
+            ),
+            title: Text(
+              pdf.name,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                decoration: pdf.isCompleted ? TextDecoration.lineThrough : null,
+              ),
+            ),
+            subtitle: Text(
+              pdf.isCompleted ? 'Completed' : 'Not completed',
+              style: TextStyle(
+                color: pdf.isCompleted ? Colors.green : theme.colorScheme.onSurface.withOpacity(0.6),
+                fontSize: 12,
+              ),
+            ),
+            trailing: IconButton(
               onPressed: () => _toggleCompletion(pdf),
               icon: Icon(
                 pdf.isCompleted ? Icons.check_circle : Icons.circle_outlined,
@@ -4969,56 +4968,59 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
               ),
               tooltip: pdf.isCompleted ? 'Mark as incomplete' : 'Mark as complete',
             ),
-            PopupMenuButton<String>(
-              onSelected: (value) {
-                switch (value) {
-                  case 'open':
-                    _openPDF(pdf.pdfPath);
-                    break;
-                  case 'ai':
-                    _showAiOptions(context, pdf.pdfPath);
-                    break;
-                  case 'delete':
-                    _showDeleteConfirmation(pdf, isTheory);
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'open',
-                  child: Row(
-                    children: [
-                      Icon(Icons.open_in_new),
-                      SizedBox(width: 8),
-                      Text('Open PDF'),
-                    ],
+            onTap: () => _openPDF(pdf.pdfPath),
+          ),
+          // Action buttons row
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _isProcessingAi ? null : () => _showAiOptions(context, pdf.pdfPath),
+                    icon: Icon(Icons.psychology, size: 16, color: _isProcessingAi ? null : Colors.purple),
+                    label: Text('AI Tools', style: TextStyle(fontSize: 12)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple.withOpacity(0.1),
+                      foregroundColor: Colors.purple,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                   ),
                 ),
-                const PopupMenuItem(
-                  value: 'ai',
-                  child: Row(
-                    children: [
-                      Icon(Icons.psychology, color: Colors.purple),
-                      SizedBox(width: 8),
-                      Text('AI Tools'),
-                    ],
+                const SizedBox(width: 8),
+                ElevatedButton.icon(
+                  onPressed: () => _openPDF(pdf.pdfPath),
+                  icon: Icon(Icons.open_in_new, size: 16),
+                  label: Text('Open', style: TextStyle(fontSize: 12)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: color.withOpacity(0.1),
+                    foregroundColor: color,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete, color: Colors.red),
-                      SizedBox(width: 8),
-                      Text('Delete', style: TextStyle(color: Colors.red)),
-                    ],
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: () => _showDeleteConfirmation(pdf, isTheory),
+                  icon: Icon(Icons.delete_outline, size: 18),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.red.withOpacity(0.1),
+                    foregroundColor: Colors.red,
+                    padding: const EdgeInsets.all(8),
                   ),
+                  tooltip: 'Delete',
                 ),
               ],
             ),
-          ],
-        ),
-        onTap: () => _openPDF(pdf.pdfPath),
+          ),
+        ],
       ),
     );
   }
@@ -5088,6 +5090,21 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withOpacity(0.6),
             ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.psychology, size: 16, color: Colors.purple),
+              const SizedBox(width: 4),
+              Text(
+                'AI tools available after adding PDFs',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: Colors.purple,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
@@ -5452,6 +5469,72 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
                               ),
                             ),
                           ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+
+                // AI Tools Info Card
+                if (totalLectures > 0) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.purple.withOpacity(0.1),
+                          Colors.deepPurple.withOpacity(0.05),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.purple.withOpacity(0.2),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.purple.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.psychology,
+                            color: Colors.purple,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '🚀 AI Study Tools Available',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.purple,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Generate summaries, flashcards, quizzes & more from your PDFs',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.auto_awesome,
+                          color: Colors.purple,
+                          size: 20,
                         ),
                       ],
                     ),
