@@ -4850,34 +4850,228 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
     );
   }
 
-  Widget _buildProgressIndicator(String title, List<PDFLecture> lectures) {
-    int completedCount = lectures.where((lecture) => lecture.isCompleted).length;
-    double progress = lectures.isEmpty ? 0 : completedCount / lectures.length;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+  Widget _buildOverallProgressCard(
+    double overallProgress,
+    int completedLectures,
+    int totalLectures,
+    int completedTheory,
+    int totalTheory,
+    int completedPractical,
+    int totalPractical,
+  ) {
+    final theme = Theme.of(context);
+    
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: theme.colorScheme.outline.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.primary.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Text(title, style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
-              )),
-              const SizedBox(width: 8),
-              Text('$completedCount/${lectures.length}', style: TextStyle(color: Colors.grey[600], fontSize: 16)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Overall Progress',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '$completedLectures of $totalLectures lectures completed',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 80,
+                height: 80,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      value: overallProgress,
+                      backgroundColor: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        overallProgress >= 0.8 ? Colors.green : theme.colorScheme.primary,
+                      ),
+                      strokeWidth: 8,
+                      strokeCap: StrokeCap.round,
+                    ),
+                    Text(
+                      '${(overallProgress * 100).toInt()}%',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
+          ),
+          
+          const SizedBox(height: 24),
+          
+          Row(
+            children: [
+              Expanded(
+                child: _buildMiniProgressIndicator(
+                  'Theory',
+                  completedTheory,
+                  totalTheory,
+                  const Color(0xFF3B82F6),
+                  Icons.menu_book_outlined,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildMiniProgressIndicator(
+                  'Practical',
+                  completedPractical,
+                  totalPractical,
+                  const Color(0xFFF59E0B),
+                  Icons.science_outlined,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMiniProgressIndicator(String label, int completed, int total, Color color, IconData icon) {
+    final theme = Theme.of(context);
+    final progress = total == 0 ? 0.0 : completed / total;
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: 16),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            '$completed/$total',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
           ),
           const SizedBox(height: 8),
           ClipRRect(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                progress == 1.0 ? Colors.green : Theme.of(context).colorScheme.primary,
+              backgroundColor: color.withOpacity(0.2),
+              valueColor: AlwaysStoppedAnimation<Color>(color),
+              minHeight: 6,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, IconData icon, int completed, int total, Color color) {
+    final theme = Theme.of(context);
+    final progress = total == 0 ? 0.0 : completed / total;
+    
+    return Container(
+      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outline.withOpacity(0.1),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '$completed of $total completed',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              '${(progress * 100).toInt()}%',
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: color,
               ),
-              minHeight: 10,
             ),
           ),
         ],
@@ -4887,83 +5081,235 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final totalTheory = widget.lecture.theoryLectures.length;
+    final completedTheory = widget.lecture.theoryLectures.where((l) => l.isCompleted).length;
+    final totalPractical = widget.lecture.practicalLectures.length;
+    final completedPractical = widget.lecture.practicalLectures.where((l) => l.isCompleted).length;
+    final totalLectures = totalTheory + totalPractical;
+    final completedLectures = completedTheory + completedPractical;
+    final overallProgress = totalLectures == 0 ? 0.0 : completedLectures / totalLectures;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.lecture.name),
-      ),
-      body: Stack( // Use Stack for loading overlay
+      body: Stack(
         children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildProgressIndicator('Theory:', widget.lecture.theoryLectures),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 1.1,
+          CustomScrollView(
+            slivers: [
+              // Enhanced App Bar with lecture info
+              SliverAppBar(
+                expandedHeight: 200.0,
+                pinned: true,
+                elevation: 0,
+                scrolledUnderElevation: 4.0,
+                surfaceTintColor: theme.colorScheme.surface,
+                flexibleSpace: FlexibleSpaceBar(
+                  title: Text(
+                    widget.lecture.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          offset: Offset(0, 1),
+                          blurRadius: 3.0,
+                          color: Colors.black26,
+                        ),
+                      ],
+                    ),
                   ),
-                  itemCount: widget.lecture.theoryLectures.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index == widget.lecture.theoryLectures.length) {
-                      return _buildAddButton(true);
-                    }
-                    return _buildPDFCard(widget.lecture.theoryLectures[index], true);
-                  },
-                ),
-                const SizedBox(height: 16),
-                _buildProgressIndicator('Practical:', widget.lecture.practicalLectures),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 1.1,
+                  background: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          theme.colorScheme.primary,
+                          theme.colorScheme.primary.withOpacity(0.8),
+                        ],
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 80, 16, 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          if (widget.lecture.subtitle.isNotEmpty)
+                            Text(
+                              widget.lecture.subtitle,
+                              style: TextStyle(
+                                color: theme.colorScheme.onPrimary.withOpacity(0.9),
+                                fontSize: 14,
+                              ),
+                            ),
+                          if (widget.lecture.classroom.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on,
+                                  size: 16,
+                                  color: theme.colorScheme.onPrimary.withOpacity(0.9),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  widget.lecture.classroom,
+                                  style: TextStyle(
+                                    color: theme.colorScheme.onPrimary.withOpacity(0.9),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
                   ),
-                  itemCount: widget.lecture.practicalLectures.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index == widget.lecture.practicalLectures.length) {
-                      return _buildAddButton(false);
-                    }
-                    return _buildPDFCard(widget.lecture.practicalLectures[index], false);
-                  },
                 ),
-                const SizedBox(height: 32),
-              ],
-            ),
+              ),
+              
+              // Overall Progress Card
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: _buildOverallProgressCard(
+                    overallProgress,
+                    completedLectures,
+                    totalLectures,
+                    completedTheory,
+                    totalTheory,
+                    completedPractical,
+                    totalPractical,
+                  ),
+                ),
+              ),
+
+              // Theory Section
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _buildSectionHeader(
+                    'Theory Lectures',
+                    Icons.menu_book_outlined,
+                    completedTheory,
+                    totalTheory,
+                    const Color(0xFF3B82F6),
+                  ),
+                ),
+              ),
+              
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                sliver: SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.85,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      if (index == widget.lecture.theoryLectures.length) {
+                        return _buildEnhancedAddButton(true);
+                      }
+                      return _buildEnhancedPDFCard(widget.lecture.theoryLectures[index], true);
+                    },
+                    childCount: widget.lecture.theoryLectures.length + 1,
+                  ),
+                ),
+              ),
+
+              // Practical Section
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
+                  child: _buildSectionHeader(
+                    'Practical Lectures',
+                    Icons.science_outlined,
+                    completedPractical,
+                    totalPractical,
+                    const Color(0xFFF59E0B),
+                  ),
+                ),
+              ),
+              
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                sliver: SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.85,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      if (index == widget.lecture.practicalLectures.length) {
+                        return _buildEnhancedAddButton(false);
+                      }
+                      return _buildEnhancedPDFCard(widget.lecture.practicalLectures[index], false);
+                    },
+                    childCount: widget.lecture.practicalLectures.length + 1,
+                  ),
+                ),
+              ),
+
+              // Bottom spacing
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 32),
+              ),
+            ],
           ),
-          // Loading Overlay
+          
+          // Enhanced Loading Overlay
           if (_isProcessingAi)
             Container(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.black.withOpacity(0.6)
-                  : Colors.white.withOpacity(0.6),
+              color: theme.brightness == Brightness.dark
+                  ? Colors.black.withOpacity(0.7)
+                  : Colors.white.withOpacity(0.7),
               child: Center(
                 child: Container(
-                    padding: const EdgeInsets.all(25),
-                    decoration: BoxDecoration(
-                       color: Theme.of(context).cardColor,
-                       borderRadius: BorderRadius.circular(15),
-                       boxShadow: [
-                          BoxShadow(
-                             color: Colors.black.withOpacity(0.1),
-                             blurRadius: 10,
-                             spreadRadius: 2,
-                          )
-                       ]
-                    ),
-                    child: Column(
-                       mainAxisSize: MainAxisSize.min,
-                       children: [
-                          const CircularProgressIndicator(),
-                          const SizedBox(height: 20),
-                          Text(
-                             "AI is thinking...",
-                             style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                       ],
-                    ),
+                  padding: const EdgeInsets.all(32),
+                  margin: const EdgeInsets.symmetric(horizontal: 32),
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 20,
+                        spreadRadius: 2,
+                      )
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 3,
+                          valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        "AI is thinking...",
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Please wait while we process your request",
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -4972,97 +5318,198 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
     );
   }
 
-  Widget _buildPDFCard(PDFLecture pdfLecture, bool isTheory) {
-    final color = pdfLecture.isCompleted ? Colors.green : Theme.of(context).colorScheme.primary;
+  Widget _buildEnhancedPDFCard(PDFLecture pdfLecture, bool isTheory) {
+    final theme = Theme.of(context);
+    final sectionColor = isTheory ? const Color(0xFF3B82F6) : const Color(0xFFF59E0B);
+    final isCompleted = pdfLecture.isCompleted;
 
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => _openPDF(pdfLecture.pdfPath),
-        onLongPress: () => _toggleCompletion(pdfLecture),
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.picture_as_pdf_outlined, size: 60, color: color),
-                  const SizedBox(height: 12),
-                  Text(
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isCompleted 
+              ? Colors.green.withOpacity(0.3)
+              : theme.colorScheme.outline.withOpacity(0.1),
+          width: isCompleted ? 2 : 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: (isCompleted ? Colors.green : sectionColor).withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => _openPDF(pdfLecture.pdfPath),
+          onLongPress: () => _toggleCompletion(pdfLecture),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header with completion status
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: (isCompleted ? Colors.green : sectionColor).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.picture_as_pdf_outlined,
+                        size: 20,
+                        color: isCompleted ? Colors.green : sectionColor,
+                      ),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () => _toggleCompletion(pdfLecture),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: isCompleted ? Colors.green : Colors.grey.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          isCompleted ? Icons.check : Icons.circle_outlined,
+                          size: 16,
+                          color: isCompleted ? Colors.white : Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 16),
+                
+                // PDF Name
+                Expanded(
+                  child: Text(
                     pdfLecture.name,
-                    textAlign: TextAlign.center,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      decoration: isCompleted ? TextDecoration.lineThrough : null,
+                      color: isCompleted 
+                          ? theme.colorScheme.onSurface.withOpacity(0.6)
+                          : theme.colorScheme.onSurface,
+                    ),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 14,
-                      decoration: pdfLecture.isCompleted ? TextDecoration.lineThrough : null,
-                      color: pdfLecture.isCompleted ? Colors.grey[600] : null,
-                    ),
                   ),
-                ],
-              ),
+                ),
+                
+                const SizedBox(height: 16),
+                
+                // Action buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 32,
+                        child: ElevatedButton(
+                          onPressed: _isProcessingAi ? null : () => _showAiOptions(context, pdfLecture.pdfPath),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.purple.withOpacity(0.1),
+                            foregroundColor: Colors.purple,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: EdgeInsets.zero,
+                          ),
+                          child: const Icon(Icons.psychology_outlined, size: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 32,
+                      height: 32,
+                      child: ElevatedButton(
+                        onPressed: () => _showDeleteConfirmation(pdfLecture, isTheory),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.withOpacity(0.1),
+                          foregroundColor: Colors.red,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: EdgeInsets.zero,
+                        ),
+                        child: const Icon(Icons.delete_outline, size: 16),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            Positioned(
-              top: 0,
-              right: 0,
-              child: Checkbox(
-                value: pdfLecture.isCompleted,
-                onChanged: (_) => _toggleCompletion(pdfLecture),
-                activeColor: Colors.green,
-                shape: const CircleBorder(),
-                visualDensity: VisualDensity.compact,
-              ),
-            ),
-            Positioned(
-              top: 4,
-              left: 4,
-              child: IconButton(
-                icon: Icon(Icons.delete_outline, color: Colors.redAccent[100]),
-                onPressed: () => _showDeleteConfirmation(pdfLecture, isTheory),
-                iconSize: 22,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                tooltip: 'Delete Lecture',
-              ),
-            ),
-            Positioned(
-              bottom: 4,
-              right: 4,
-              child: IconButton(
-                icon: Icon(Icons.psychology_outlined, color: Colors.purpleAccent[100]),
-                onPressed: _isProcessingAi ? null : () => _showAiOptions(context, pdfLecture.pdfPath),
-                iconSize: 22,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                tooltip: 'AI Study Tools',
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildAddButton(bool isTheory) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide.none,
+  Widget _buildEnhancedAddButton(bool isTheory) {
+    final theme = Theme.of(context);
+    final sectionColor = isTheory ? const Color(0xFF3B82F6) : const Color(0xFFF59E0B);
+    
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: sectionColor.withOpacity(0.3),
+          width: 2,
+          style: BorderStyle.solid,
+        ),
       ),
-      color: Theme.of(context).colorScheme.surface,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () => _pickAndSavePDF(isTheory),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.add_circle_outline, size: 48, color: Theme.of(context).colorScheme.primary),
-              const SizedBox(height: 8),
-              Text('Add ${isTheory ? "Theory" : "Practical"}', textAlign: TextAlign.center, style: TextStyle(color: Theme.of(context).colorScheme.primary)),
-            ],
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => _pickAndSavePDF(isTheory),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: sectionColor.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.add,
+                    size: 32,
+                    color: sectionColor,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Add ${isTheory ? "Theory" : "Practical"}',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: sectionColor,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Tap to upload PDF',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
