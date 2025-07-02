@@ -4387,7 +4387,7 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
   }
 
   Future<void> _openPDF(String? pdfPath) async {
-     try {
+    try {
       if (pdfPath == null || pdfPath.isEmpty) {
         print('Error: PDF path is null or empty');
         if (mounted) {
@@ -4397,6 +4397,7 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
         }
         return;
       }
+      
       final file = File(pdfPath);
       if (!await file.exists()) {
         print('Error: PDF file does not exist at path: $pdfPath');
@@ -4407,12 +4408,28 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
         }
         return;
       }
+      
+      print('Attempting to open PDF: $pdfPath');
       final result = await OpenFile.open(pdfPath);
-      if (result.type != "done") {
+      print('PDF open result: ${result.type} - ${result.message}');
+      
+      if (result.type != "done" && result.type != "noAppToOpen") {
         print('Error opening PDF: ${result.message}');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error opening PDF: ${result.message}'), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text('Error opening PDF: ${result.message ?? "Unknown error"}'), 
+              backgroundColor: Colors.red
+            ),
+          );
+        }
+      } else if (result.type == "noAppToOpen") {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No app found to open PDF files. Please install a PDF viewer.'), 
+              backgroundColor: Colors.orange
+            ),
           );
         }
       }
@@ -5123,63 +5140,8 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
 
   
 
-  Widget _buildMiniProgressIndicator(String label, int completed, int total, Color color, IconData icon) {
-    final theme = Theme.of(context);
-    final progress = total == 0 ? 0.0 : completed / total;
-    
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(0.2),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Icon(icon, color: color, size: 16),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: color,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            '$completed/$total',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: progress,
-              backgroundColor: color.withOpacity(0.2),
-              valueColor: AlwaysStoppedAnimation<Color>(color),
-              minHeight: 6,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  
-
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final totalTheory = widget.lecture.theoryLectures.length;
     final completedTheory = widget.lecture.theoryLectures.where((l) => l.isCompleted).length;
     final totalPractical = widget.lecture.practicalLectures.length;
