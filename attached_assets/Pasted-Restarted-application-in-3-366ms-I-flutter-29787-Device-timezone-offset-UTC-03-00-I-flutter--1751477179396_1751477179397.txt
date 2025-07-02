@@ -1,0 +1,236 @@
+Restarted application in 3,366ms.
+I/flutter (29787): Device timezone offset: UTC+03:00
+I/flutter (29787): Found matching timezone: Africa/Addis_Ababa
+I/flutter (29787): Initializing notifications system...
+I/flutter (29787): FlutterLocalNotificationsPlugin initialized: true
+D/ViewRootImplExtImpl(29787): wrapConfigInfoIntoFlags rotation=0, smallestScreenWidthDp=411, relayoutAsync=true, flags=0, newFlags=26935296, residentWS=false, title=com.example.wanakanm/com.example.wanakanm.MainActivity
+D/VRI[MainActivity](29787): relayoutWindow result, sizeChanged:false, surfaceControlChanged:false, transformHintChanged:false, mSurfaceSize:Point(1080, 2412), mLastSurfaceSize:Point(1080, 2412), mWidth:1080, mHeight:2412, requestedWidth:1080, requestedHeight:2412, transformHint:0, installOrientation:0, displayRotation:0, isSurfaceValid:true, attr.flag:-2122252032, tmpFrames:ClientWindowFrames{frame=[0,0][1080,2412] display=[0,0][1080,2412] parentFrame=[0,0][1080,2412]}, relayoutAsync:true, mSyncSeqId:0
+W/VRI[MainActivity](29787): updateBlastSurfaceIfNeeded, surfaceSize:Point(1080, 2412), lastSurfaceSize:Point(1080, 2412), format:-3, blastBufferQueue:android.graphics.BLASTBufferQueue@5a8d467
+I/SurfaceControl(29787):  setExtendedRangeBrightness sc=Surface(name=com.example.wanakanm/com.example.wanakanm.MainActivity)/@0x2dc0ab5,currentBufferRatio=1.0,desiredRatio=1.0
+I/flutter (29787): Notification channel "study_events_channel" created/updated successfully.
+I/flutter (29787): Notification channel "study_reminders" created/updated successfully.
+I/flutter (29787): Requesting initial set of permissions in main()...
+D/permissions_handler(29787): No permissions found in manifest for: []34
+D/callGcSupression(29787): java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[])' on a null object reference
+D/ScrollOptim [SceneManager](29787): updateCurrentActivity: mCurrentActivityName=null, isOptEnable=true, isAnimAheadEnable=true, isFrameInsertEnable=true, InsertNum=1, isEnabledForScrollChanged=false
+D/VRI[MainActivity](29787): onFocusEvent false
+D/ColorModeChangeItem(29787): preExecute mColorMode=0
+D/callGcSupression(29787): java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object java.lang.reflect.Method.invoke(java.lang.Object, java.lang.Object[])' on a null object reference
+D/ScrollOptim [SceneManager](29787): updateCurrentActivity: mCurrentActivityName=com.example.wanakanm.MainActivity, isOptEnable=true, isAnimAheadEnable=true, isFrameInsertEnable=true, InsertNum=1, isEnabledForScrollChanged=false
+D/ActivityThread(29787): ComponentInfo{com.example.wanakanm/com.example.wanakanm.MainActivity} checkFinished=false 4
+D/ResourcesManagerExtImpl(29787): applyConfigurationToAppResourcesLocked app.getDisplayId() return callback.displayId:0
+I/flutter (29787): Permission.notification status: PermissionStatus.granted
+I/flutter (29787): Permission.scheduleExactAlarm status: PermissionStatus.denied
+I/flutter (29787): Permission.storage status: PermissionStatus.denied
+D/VRI[MainActivity](29787): onFocusEvent true
+D/permissions_handler(29787): No permissions found in manifest for: []22
+I/flutter (29787): Permission.manageExternalStorage initial status: PermissionStatus.denied
+D/permissions_handler(29787): No permissions found in manifest for: []22
+I/flutter (29787): Permission.manageExternalStorage status after request: PermissionStatus.denied
+D/OplusScrollToTopManager(29787): com.example.wanakanm/com.example.wanakanm.MainActivity,This com.android.internal.policy.DecorView{13239ad V.E...... R.....I. 0,0-1080,2412 aid=0 alpha=1.0 viewInfo = }[MainActivity] change focus to false
+I/Choreographer(29787): Skipped 132 frames!  The application may be doing too much work on its main thread.
+D/ViewRootImplExtImpl(29787): wrapConfigInfoIntoFlags rotation=0, smallestScreenWidthDp=411, relayoutAsync=true, flags=0, newFlags=26935296, residentWS=false, title=com.example.wanakanm/com.example.wanakanm.MainActivity
+D/VRI[MainActivity](29787): relayoutWindow result, sizeChanged:false, surfaceControlChanged:false, transformHintChanged:false, mSurfaceSize:Point(1080, 2412), mLastSurfaceSize:Point(1080, 2412), mWidth:1080, mHeight:2412, requestedWidth:1080, requestedHeight:2412, transformHint:0, installOrientation:0, displayRotation:0, isSurfaceValid:true, attr.flag:-2122252032, tmpFrames:ClientWindowFrames{frame=[0,0][1080,2412] display=[0,0][1080,2412] parentFrame=[0,0][1080,2412]}, relayoutAsync:true, mSyncSeqId:0
+W/VRI[MainActivity](29787): updateBlastSurfaceIfNeeded, surfaceSize:Point(1080, 2412), lastSurfaceSize:Point(1080, 2412), format:-3, blastBufferQueue:android.graphics.BLASTBufferQueue@5a8d467
+V/AutofillManager(29787): requestHideFillUi(null): anchor = null
+D/OplusScrollToTopManager(29787): com.example.wanakanm/com.example.wanakanm.MainActivity,This com.android.internal.policy.DecorView{13239ad V.E...... R.....I. 0,0-1080,2412 aid=0 alpha=1.0 viewInfo = }[MainActivity] change focus to true
+D/ViewRootImplExtImpl(29787): the up motion event handled by client, just return
+I/flutter (29787): Starting updateWidgets function...
+I/flutter (29787): Total incomplete tasks found: 32
+I/flutter (29787): Selected 5 tasks. Saving: [{"name":"Disesaes of Urinary System.pptx","type":"Theory","subject":"Special Medicine"},{"name":"Mycotoxicosis.pptx","type":"Theory","subject":"Poultry Diseases"},{"name":"lung diseases ","type":"Theory","subject":"Special Medicine"},{"name":"The endocrine control of male reproduction","type":"Theory","subject":"Male Fertility and Artificial Insemination"},{"name":"CCHF.pptx","type":"Theory","subject":"Zoonotic Diseases and Diagnostic Techniques"}]
+I/flutter (29787): Error updating widgets: PlatformException(-3, No Widget found with Name DailyTasksWidgetProvider. Argument 'name' must be the same as your AppWidgetProvider you wish to update, java.lang.ClassNotFoundException: com.example.wanakanm.DailyTasksWidgetProvider
+I/flutter (29787): 	at java.lang.Class.classForName(Native Method)
+I/flutter (29787): 	at java.lang.Class.forName(Class.java:607)
+I/flutter (29787): 	at java.lang.Class.forName(Class.java:512)
+I/flutter (29787): 	at es.antonborri.home_widget.HomeWidgetPlugin.onMethodCall(HomeWidgetPlugin.kt:105)
+I/flutter (29787): 	at io.flutter.plugin.common.MethodChannel$IncomingMethodCallHandler.onMessage(MethodChannel.java:267)
+I/flutter (29787): 	at io.flutter.embedding.engine.dart.DartMessenger.invokeHandler(DartMessenger.java:292)
+I/flutter (29787): 	at io.flutter.embedding.engine.dart.DartMessenger.lambda$dispatchMessageToQueue$0$io-flutter-embedding-engine-dart-DartMessenger(DartMessenger.java:319)
+I/flutter (29787): 	at io.flutter.embedding.engine.dart.DartMessenger$$ExternalSyntheticLambda0.run(D8$$SyntheticClass:0)
+I/flutter (29787): 	at android.os.Handler.handleCallback(Handler.java:973)
+I/flutter (29787): 	at android.os.Handler.dispatchMessage(H
+I/flutter (29787): Stack trace: #0      StandardMethodCodec.decodeEnvelope (package:flutter/src/services/message_codecs.dart:646:7)
+I/flutter (29787): #1      MethodChannel._invokeMethod (package:flutter/src/services/platform_channel.dart:334:18)
+I/flutter (29787): <asynchronous suspension>
+I/flutter (29787): #2      updateWidgets (package:wanakanm/main.dart:175:7)
+I/flutter (29787): <asynchronous suspension>
+I/flutter (29787): #3      _HomePageState.initState.<anonymous closure> (package:wanakanm/main.dart:2355:7)
+I/flutter (29787): <asynchronous suspension>
+I/flutter (29787): Error updating widget: PlatformException(-3, No Widget found with Name StudyWidgetProvider. Argument 'name' must be the same as your AppWidgetProvider you wish to update, java.lang.ClassNotFoundException: com.example.wanakanm.StudyWidgetProvider
+I/flutter (29787): 	at java.lang.Class.classForName(Native Method)
+I/flutter (29787): 	at java.lang.Class.forName(Class.java:607)
+I/flutter (29787): 	at java.lang.Class.forName(Class.java:512)
+I/flutter (29787): 	at es.antonborri.home_widget.HomeWidgetPlugin.onMethodCall(HomeWidgetPlugin.kt:105)
+I/flutter (29787): 	at io.flutter.plugin.common.MethodChannel$IncomingMethodCallHandler.onMessage(MethodChannel.java:267)
+I/flutter (29787): 	at io.flutter.embedding.engine.dart.DartMessenger.invokeHandler(DartMessenger.java:292)
+I/flutter (29787): 	at io.flutter.embedding.engine.dart.DartMessenger.lambda$dispatchMessageToQueue$0$io-flutter-embedding-engine-dart-DartMessenger(DartMessenger.java:319)
+I/flutter (29787): 	at io.flutter.embedding.engine.dart.DartMessenger$$ExternalSyntheticLambda0.run(D8$$SyntheticClass:0)
+I/flutter (29787): 	at android.os.Handler.handleCallback(Handler.java:973)
+I/flutter (29787): 	at android.os.Handler.dispatchMessage(Handler.java
+V/AutofillManager(29787): requestHideFillUi(null): anchor = null
+D/ViewRootImplExtImpl(29787): the up motion event handled by client, just return
+
+════════ Exception caught by widgets library ═══════════════════════════════════
+The following LateError was thrown building LectureDetailPage(dirty, dependencies: [InheritedCupertinoTheme, _InheritedTheme, _LocalizationsScope-[GlobalKey#509e0]], state: _LectureDetailPageState#51b4f):
+LateInitializationError: Field 'theme' has not been initialized.
+
+The relevant error-causing widget was:
+    LectureDetailPage LectureDetailPage:file:///C:/Users/NAMI/Desktop/studyorganizer-1/lib/main.dart:3714:39
+
+When the exception was thrown, this was the stack:
+#0      _LectureDetailPageState.theme (package:wanakanm/main.dart)
+#1      _LectureDetailPageState.build (package:wanakanm/main.dart:5311:40)
+#2      StatefulElement.build (package:flutter/src/widgets/framework.dart:5748:27)
+#3      ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5636:15)
+#4      StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5799:11)
+#5      Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
+#6      ComponentElement._firstBuild (package:flutter/src/widgets/framework.dart:5618:5)
+#7      StatefulElement._firstBuild (package:flutter/src/widgets/framework.dart:5790:11)
+#8      ComponentElement.mount (package:flutter/src/widgets/framework.dart:5612:5)
+...     Normal element mounting (228 frames)
+#236    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4480:16)
+#237    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7054:36)
+#238    Element.updateChild (package:flutter/src/widgets/framework.dart:3963:18)
+#239    Element.updateChildren (package:flutter/src/widgets/framework.dart:4150:32)
+#240    MultiChildRenderObjectElement.update (package:flutter/src/widgets/framework.dart:7079:17)
+#241    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
+#242    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5661:16)
+#243    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5799:11)
+#244    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
+#245    StatefulElement.update (package:flutter/src/widgets/framework.dart:5822:5)
+#246    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
+#247    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5661:16)
+#248    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
+#249    ProxyElement.update (package:flutter/src/widgets/framework.dart:5965:5)
+#250    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
+#251    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5661:16)
+#252    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
+#253    ProxyElement.update (package:flutter/src/widgets/framework.dart:5965:5)
+#254    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:112:11)
+#255    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
+#256    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5661:16)
+#257    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5799:11)
+#258    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
+#259    StatefulElement.update (package:flutter/src/widgets/framework.dart:5822:5)
+#260    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
+#261    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5661:16)
+#262    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
+#263    ProxyElement.update (package:flutter/src/widgets/framework.dart:5965:5)
+#264    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:112:11)
+#265    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
+#266    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5661:16)
+#267    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5799:11)
+#268    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
+#269    StatefulElement.update (package:flutter/src/widgets/framework.dart:5822:5)
+#270    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
+#271    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5661:16)
+#272    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5799:11)
+#273    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
+#274    StatefulElement.update (package:flutter/src/widgets/framework.dart:5822:5)
+#275    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
+#276    SingleChildRenderObjectElement.update (package:flutter/src/widgets/framework.dart:6926:14)
+#277    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
+#278    SingleChildRenderObjectElement.update (package:flutter/src/widgets/framework.dart:6926:14)
+#279    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
+#280    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5661:16)
+#281    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
+#282    ProxyElement.update (package:flutter/src/widgets/framework.dart:5965:5)
+#283    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
+#284    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5661:16)
+#285    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
+#286    ProxyElement.update (package:flutter/src/widgets/framework.dart:5965:5)
+#287    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
+#288    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5661:16)
+#289    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5799:11)
+#290    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
+#291    BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2694:15)
+#292    BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2753:11)
+#293    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3048:18)
+#294    WidgetsBinding.drawFrame (package:flutter/src/widgets/binding.dart:1176:21)
+#295    RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:475:5)
+#296    SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1397:15)
+#297    SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1318:9)
+#298    SchedulerBinding._handleDrawFrame (package:flutter/src/scheduler/binding.dart:1176:5)
+#299    _invoke (dart:ui/hooks.dart:312:13)
+#300    PlatformDispatcher._drawFrame (dart:ui/platform_dispatcher.dart:427:5)
+#301    _drawFrame (dart:ui/hooks.dart:283:31)
+
+════════════════════════════════════════════════════════════════════════════════
+W/WindowOnBackDispatcher(29787): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher(29787): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/Activity(29787): dispatchKeyEvent to com.example.wanakanm.MainActivity@a88453 will call onBackPressed
+lib/main.dart:5154:24: Error: The getter 'theme' isn't defined for the class '_LectureDetailPageState'.
+ - '_LectureDetailPageState' is from 'package:wanakanm/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'theme'.
+      backgroundColor: theme.colorScheme.background,
+                       ^^^^^
+lib/main.dart:5164:24: Error: The getter 'theme' isn't defined for the class '_LectureDetailPageState'.
+ - '_LectureDetailPageState' is from 'package:wanakanm/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'theme'.
+                color: theme.colorScheme.onSurface,
+                       ^^^^^
+lib/main.dart:5172:26: Error: The getter 'theme' isn't defined for the class '_LectureDetailPageState'.
+ - '_LectureDetailPageState' is from 'package:wanakanm/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'theme'.
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                         ^^^^^
+lib/main.dart:5177:26: Error: The getter 'theme' isn't defined for the class '_LectureDetailPageState'.
+ - '_LectureDetailPageState' is from 'package:wanakanm/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'theme'.
+        backgroundColor: theme.colorScheme.surface,
+                         ^^^^^
+lib/main.dart:5186:79: Error: The getter 'theme' isn't defined for the class '_LectureDetailPageState'.
+ - '_LectureDetailPageState' is from 'package:wanakanm/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'theme'.
+              color: overallProgress >= 0.8 ? Colors.green.withOpacity(0.1) : theme.colorScheme.primary.withOpacity(0.1),
+                                                                              ^^^^^
+lib/main.dart:5195:66: Error: The getter 'theme' isn't defined for the class '_LectureDetailPageState'.
+ - '_LectureDetailPageState' is from 'package:wanakanm/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'theme'.
+                  color: overallProgress >= 0.8 ? Colors.green : theme.colorScheme.primary,
+                                                                 ^^^^^
+lib/main.dart:5203:68: Error: The getter 'theme' isn't defined for the class '_LectureDetailPageState'.
+ - '_LectureDetailPageState' is from 'package:wanakanm/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'theme'.
+                    color: overallProgress >= 0.8 ? Colors.green : theme.colorScheme.primary,
+                                                                   ^^^^^
+lib/main.dart:5224:30: Error: The getter 'theme' isn't defined for the class '_LectureDetailPageState'.
+ - '_LectureDetailPageState' is from 'package:wanakanm/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'theme'.
+                      color: theme.colorScheme.surface,
+                             ^^^^^
+lib/main.dart:5227:32: Error: The getter 'theme' isn't defined for the class '_LectureDetailPageState'.
+ - '_LectureDetailPageState' is from 'package:wanakanm/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'theme'.
+                        color: theme.colorScheme.outline.withOpacity(0.1),
+                               ^^^^^
+lib/main.dart:5234:34: Error: The getter 'theme' isn't defined for the class '_LectureDetailPageState'.
+ - '_LectureDetailPageState' is from 'package:wanakanm/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'theme'.
+                          style: theme.textTheme.titleMedium?.copyWith(
+                                 ^^^^^
+lib/main.dart:5308:40: Error: The getter 'theme' isn't defined for the class '_LectureDetailPageState'.
+ - '_LectureDetailPageState' is from 'package:wanakanm/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'theme'.
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                       ^^^^^
+lib/main.dart:5316:40: Error: The getter 'theme' isn't defined for the class '_LectureDetailPageState'.
+ - '_LectureDetailPageState' is from 'package:wanakanm/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'theme'.
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                       ^^^^^
+lib/main.dart:5317:42: Error: The getter 'theme' isn't defined for the class '_LectureDetailPageState'.
+ - '_LectureDetailPageState' is from 'package:wanakanm/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'theme'.
+                                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                         ^^^^^
+lib/main.dart:5376:28: Error: The getter 'theme' isn't defined for the class '_LectureDetailPageState'.
+ - '_LectureDetailPageState' is from 'package:wanakanm/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'theme'.
+                    color: theme.colorScheme.surface,
+                           ^^^^^
+lib/main.dart:5386:32: Error: The getter 'theme' isn't defined for the class '_LectureDetailPageState'.
+ - '_LectureDetailPageState' is from 'package:wanakanm/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'theme'.
+                        style: theme.textTheme.titleMedium,
+                               ^^^^^
