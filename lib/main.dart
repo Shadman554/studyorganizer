@@ -4297,6 +4297,7 @@ class LectureDetailPage extends StatefulWidget {
 }
 
 class _LectureDetailPageState extends State<LectureDetailPage> {
+  ThemeData get theme => Theme.of(context);
   // --- ADDED FOR AI FEATURES ---
   late final AiService _aiService;
   String? _currentPdfText; // To store extracted text for the currently selected PDF
@@ -4413,12 +4414,12 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
       final result = await OpenFile.open(pdfPath);
       print('PDF open result: ${result.type} - ${result.message}');
       
-      if (result.type != "done" && result.type != "noAppToOpen") {
+      if (result.type == "error") {
         print('Error opening PDF: ${result.message}');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error opening PDF: ${result.message ?? "Unknown error"}'), 
+              content: Text('Error opening PDF: ${result.message}'), 
               backgroundColor: Colors.red
             ),
           );
@@ -4429,6 +4430,15 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
             const SnackBar(
               content: Text('No app found to open PDF files. Please install a PDF viewer.'), 
               backgroundColor: Colors.orange
+            ),
+          );
+        }
+      } else if (result.type == "done") {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('PDF opened successfully'),
+              backgroundColor: Colors.green
             ),
           );
         }
@@ -5043,7 +5053,7 @@ class _LectureDetailPageState extends State<LectureDetailPage> {
   }
 
   Widget _buildSimpleAddButton(bool isTheory, Color color) {
-    final theme = Theme.of(context);
+    Theme.of(context);
     
     return Container(
       width: double.infinity,

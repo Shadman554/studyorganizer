@@ -6,6 +6,8 @@ import 'dart:io';
 class AiService {
   final String apiKey;
   late final GenerativeModel _model;
+  static final Map<String, String> _cache = {};
+  static const int _maxCacheSize = 50;
 
   AiService({required this.apiKey}) {
     _model = GenerativeModel(
@@ -13,13 +15,28 @@ class AiService {
       apiKey: apiKey,
       generationConfig: GenerationConfig(
         temperature: 0.3,
-        maxOutputTokens: 4096,
+        maxOutputTokens: 8192, // Increased for better responses
+        topP: 0.8,
+        topK: 40,
       ),
-      // --- MODIFIED: REMOVED safetySettings ENTIRELY ---
-      // safetySettings: [ ... ] // This whole block is now gone!
-      // --- END MODIFICATION ---
     );
   }
+
+  /// Cache management
+  String _getCacheKey(String prompt, String pdfText) {
+    final combined = '$prompt${pdfText.substring(0, pdfText.length > 100 ? 100 : pdfText.length)}';
+    return combined.hashCode.toString();
+  }
+
+  void _addToCache(String key, String value) {
+    if (_cache.length >= _maxCacheSize) {
+      _cache.remove(_cache.keys.first);
+    }
+    _cache[key] = value;
+  }
+
+  /// Check if API key is valid
+  bool get isValidApiKey => apiKey.isNotEmpty && apiKey.startsWith('AIza');
 
   /// Extracts text from a PDF file using Syncfusion PDF.
   Future<String?> extractPdfText(String filePath) async {
@@ -47,14 +64,47 @@ class AiService {
   }
 
   Future<String?> _generateContent(String prompt, String pdfText) async {
+    if (!isValidApiKey) {
+      return 'Invalid API key. Please check your configuration.';
+    }
+
+    final cacheKey = _getCacheKey(prompt, pdfText);
+    if (_cache.containsKey(cacheKey)) {
+      print('Using cached response for prompt');
+      return _cache[cacheKey];
+    }
+
     try {
-      final fullPrompt = '$prompt\n\n--- PDF Content ---\n$pdfText';
+      // Truncate PDF text if too long to avoid token limits
+      String truncatedPdfText = pdfText;
+      if (pdfText.length > 30000) {
+        truncatedPdfText = pdfText.substring(0, 30000) + '\n\n[Content truncated due to length...]';
+        print('PDF content truncated from ${pdfText.length} to 30000 characters');
+      }
+
+      final fullPrompt = '''$prompt
+
+--- PDF Content ---
+$truncatedPdfText
+
+--- Instructions ---
+Please provide a comprehensive response based solely on the content above. 
+Ensure accuracy and completeness in your analysis.''';
+
       final response = await _model.generateContent([Content.text(fullPrompt)]);
-      return response.text;
+      
+      if (response.text != null && response.text!.isNotEmpty) {
+        _addToCache(cacheKey, response.text!);
+        return response.text;
+      } else {
+        return 'AI generated an empty response. Please try again.';
+      }
+    } on GenerativeAIException catch (e) {
+      print('GenerativeAI Error: ${e.message}');
+      return "AI Error: ${e.message}. Please check your API key and try again.";
     } catch (e) {
-      print('Error generating AI content: $e');
-      if (e is GenerativeAIException) { return "AI Error: ${e.message}"; }
-      return 'Failed to get a response from AI.';
+      print('Unexpected error generating AI content: $e');
+      return 'An unexpected error occurred. Please try again later.';
     }
   }
 
@@ -322,5 +372,36 @@ Create a comprehensive study guide for the following text. The study guide MUST 
                    'If it is incorrect, state "Incorrect." and explain *why* it is incorrect, '
                    'providing the correct information based *strictly* on the provided PDF content.';
     return await _generateContent(prompt, pdfText);
+  }
+
+  /// Validate PDF content before processing
+  bool validatePdfContent(String pdfText) {
+    if (pdfText.trim().isEmpty) return false;
+    if (pdfText.length < 50) return false; // Too short to be meaningful
+    return true;
+  }
+
+  /// Get content statistics
+  Map<String, dynamic> getContentStats(String pdfText) {
+    final words = pdfText.split(RegExp(r'\s+')).where((word) => word.isNotEmpty).length;
+    final characters = pdfText.length;
+    final paragraphs = pdfText.split('\n\n').where((p) => p.trim().isNotEmpty).length;
+    
+    return {
+      'words': words,
+      'characters': characters,
+      'paragraphs': paragraphs,
+      'estimatedProcessingTime': (words / 1000 * 2).ceil(), // rough estimate in seconds
+    };
+  }
+
+  /// Clear cache
+  static void clearCache() {
+    _cache.clear();
+  }
+
+  /// Get cache size
+  static int getCacheSize() {
+    return _cache.length;
   }
 }

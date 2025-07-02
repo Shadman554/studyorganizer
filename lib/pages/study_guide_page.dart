@@ -25,10 +25,15 @@ class _StudyGuidePageState extends State<StudyGuidePage> with SingleTickerProvid
     Icons.topic_outlined,
     Icons.key_outlined,
     Icons.map_outlined,
-    Icons.yard,
+    Icons.quiz_outlined,
   ];
 
   List<String> _availableSections = [];
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  bool _isSearchMode = false;
+  final Set<String> _bookmarkedSections = <String>{};
+  double _fontSize = 16.0;
 
   @override
   void initState() {
@@ -65,6 +70,7 @@ class _StudyGuidePageState extends State<StudyGuidePage> with SingleTickerProvid
   @override
   void dispose() {
     _tabController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -84,23 +90,98 @@ class _StudyGuidePageState extends State<StudyGuidePage> with SingleTickerProvid
     return Scaffold(
       backgroundColor: colorScheme.surface, // Use theme surface color
       appBar: AppBar(
-        backgroundColor: colorScheme.surface, // Use theme surface color
-        foregroundColor: colorScheme.onSurface, // Use theme onSurface color for text/icons
-        title: Text(widget.title),
-        bottom: TabBar(
+        backgroundColor: colorScheme.surface,
+        foregroundColor: colorScheme.onSurface,
+        title: _isSearchMode 
+          ? TextField(
+              controller: _searchController,
+              autofocus: true,
+              decoration: InputDecoration(
+                hintText: 'Search study guide...',
+                hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)),
+                border: InputBorder.none,
+              ),
+              style: TextStyle(color: colorScheme.onSurface),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value.toLowerCase();
+                });
+              },
+            )
+          : Text(widget.title),
+        actions: [
+          IconButton(
+            icon: Icon(_isSearchMode ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() {
+                _isSearchMode = !_isSearchMode;
+                if (!_isSearchMode) {
+                  _searchController.clear();
+                  _searchQuery = '';
+                }
+              });
+            },
+          ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) {
+              switch (value) {
+                case 'font_size':
+                  _showFontSizeDialog();
+                  break;
+                case 'bookmarks':
+                  _showBookmarksDialog();
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'font_size',
+                child: Row(
+                  children: [
+                    Icon(Icons.text_fields),
+                    SizedBox(width: 8),
+                    Text('Font Size'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'bookmarks',
+                child: Row(
+                  children: [
+                    Icon(Icons.bookmark),
+                    SizedBox(width: 8),
+                    Text('Bookmarks'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+        bottom: !_isSearchMode ? TabBar(
           controller: _tabController,
           isScrollable: true,
-          indicatorColor: primaryColor, // Use primary color for indicator
-          labelColor: primaryColor, // Use primary color for selected label
-          unselectedLabelColor: onSurfaceColor.withOpacity(0.6), // Muted for unselected
+          indicatorColor: primaryColor,
+          labelColor: primaryColor,
+          unselectedLabelColor: onSurfaceColor.withOpacity(0.6),
           tabs: _availableSections.map((section) {
             final index = _sections.indexOf(section);
             return Tab(
-              icon: Icon(_sectionIcons[index]),
+              icon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(_sectionIcons[index]),
+                  if (_bookmarkedSections.contains(section))
+                    const Padding(
+                      padding: EdgeInsets.only(left: 4),
+                      child: Icon(Icons.bookmark, size: 16),
+                    ),
+                ],
+              ),
               text: _sectionTitles[index],
             );
           }).toList(),
-        ),
+        ) : null,
       ),
       body: TabBarView(
         controller: _tabController,
@@ -238,6 +319,30 @@ class _StudyGuidePageState extends State<StudyGuidePage> with SingleTickerProvid
                   color: isDark ? Colors.tealAccent : Colors.teal[700],
                   margin: const EdgeInsets.only(top: 8, bottom: 16),
                 ),
+                // Section bookmark button
+                Row(
+                  children: [
+                    Expanded(child: Container()),
+                    IconButton(
+                      icon: Icon(
+                        _bookmarkedSections.contains(section) 
+                          ? Icons.bookmark 
+                          : Icons.bookmark_border,
+                        color: isDark ? Colors.tealAccent : Colors.teal[700],
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          if (_bookmarkedSections.contains(section)) {
+                            _bookmarkedSections.remove(section);
+                          } else {
+                            _bookmarkedSections.add(section);
+                          }
+                        });
+                      },
+                      tooltip: 'Bookmark this section',
+                    ),
+                  ],
+                ),
                 // Content with improved formatting
                 _buildFormattedContent(formattedContent),
               ],
@@ -306,11 +411,11 @@ class _StudyGuidePageState extends State<StudyGuidePage> with SingleTickerProvid
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SelectableText(
-                        item['text'],
+                      SelectableText.rich(
+                        _buildHighlightedText(item['text'], colorScheme),
                         style: TextStyle(
                           height: 1.5, 
-                          fontSize: 16, 
+                          fontSize: _fontSize, 
                           color: colorScheme.onSurface
                         ),
                       ),
@@ -337,11 +442,11 @@ class _StudyGuidePageState extends State<StudyGuidePage> with SingleTickerProvid
         children.add(
           Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
-            child: SelectableText(
-              item['text'],
+            child: SelectableText.rich(
+              _buildHighlightedText(item['text'], colorScheme),
               style: TextStyle(
                 height: 1.6, 
-                fontSize: 16, 
+                fontSize: _fontSize, 
                 color: colorScheme.onSurface
               ),
             ),
@@ -428,5 +533,118 @@ class _StudyGuidePageState extends State<StudyGuidePage> with SingleTickerProvid
     nextLine = nextLine.trim();
     return nextLine.isNotEmpty && nextLine.length < 100 &&
            !nextLine.startsWith('•') && !nextLine.startsWith('-') && !nextLine.startsWith('*');
+  }
+
+  TextSpan _buildHighlightedText(String text, ColorScheme colorScheme) {
+    if (_searchQuery.isEmpty || !text.toLowerCase().contains(_searchQuery)) {
+      return TextSpan(text: text);
+    }
+
+    List<TextSpan> spans = [];
+    String lowerText = text.toLowerCase();
+    int start = 0;
+    
+    while (true) {
+      int index = lowerText.indexOf(_searchQuery, start);
+      if (index == -1) {
+        spans.add(TextSpan(text: text.substring(start)));
+        break;
+      }
+      
+      if (index > start) {
+        spans.add(TextSpan(text: text.substring(start, index)));
+      }
+      
+      spans.add(TextSpan(
+        text: text.substring(index, index + _searchQuery.length),
+        style: TextStyle(
+          backgroundColor: Colors.yellow.withOpacity(0.7),
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+        ),
+      ));
+      
+      start = index + _searchQuery.length;
+    }
+    
+    return TextSpan(children: spans);
+  }
+
+  void _showFontSizeDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Font Size'),
+        content: StatefulBuilder(
+          builder: (context, setState) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Font Size: ${_fontSize.toInt()}px'),
+              Slider(
+                value: _fontSize,
+                min: 12.0,
+                max: 24.0,
+                divisions: 12,
+                onChanged: (value) {
+                  setState(() {
+                    _fontSize = value;
+                  });
+                  this.setState(() {});
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showBookmarksDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Bookmarked Sections'),
+        content: _bookmarkedSections.isEmpty
+          ? const Text('No bookmarked sections yet.')
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              children: _bookmarkedSections.map((section) {
+                final index = _sections.indexOf(section);
+                return ListTile(
+                  leading: Icon(_sectionIcons[index]),
+                  title: Text(_sectionTitles[index]),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.remove_circle),
+                    onPressed: () {
+                      setState(() {
+                        _bookmarkedSections.remove(section);
+                      });
+                      Navigator.pop(context);
+                    },
+                  ),
+                  onTap: () {
+                    final sectionIndex = _availableSections.indexOf(section);
+                    if (sectionIndex >= 0) {
+                      _tabController.animateTo(sectionIndex);
+                      Navigator.pop(context);
+                    }
+                  },
+                );
+              }).toList(),
+            ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
   }
 }
