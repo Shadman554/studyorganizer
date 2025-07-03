@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 class AIToolsPage extends StatefulWidget {
@@ -22,482 +23,508 @@ class _AIToolsPageState extends State<AIToolsPage> {
   int questionCount = 10;
   int flashcardCount = 10;
   String selectedQuizType = 'mixed';
-  String selectedDifficulty = 'medium'; // Default difficulty
+  String selectedDifficulty = 'medium';
+  bool _isGenerating = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('AI Study Tools', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.black,
+        title: Text('AI Study Tools'),
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: ListView(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        children: [
-          const Text(
-            'Generate study materials based on your PDF content',
-            style: TextStyle(color: Colors.grey),
-          ),
-          const SizedBox(height: 24),
-          
-          // Comprehensive Study Guide
-          Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.blue.withOpacity(0.3)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.menu_book, 
-                        color: Colors.blue,
-                        size: 28,
-                      ),
-                      const SizedBox(width: 12),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Comprehensive Study Guide',
-                              style: TextStyle(
-                                fontSize: 18, 
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Generate all study materials in one organized document',
-                              style: TextStyle(fontSize: 14, color: Colors.grey),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header section
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).primaryColor.withOpacity(0.1),
+                    Theme.of(context).primaryColor.withOpacity(0.05),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                Row(
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Theme.of(context).primaryColor.withOpacity(0.2),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.auto_awesome,
+                    size: 48,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'AI Study Assistant',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Generate personalized study materials from your lecture content',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Study Guide Card
+            _buildSimpleCard(
+              context,
+              title: 'Complete Study Guide',
+              subtitle: 'Get a comprehensive summary with key topics and terms',
+              icon: Icons.menu_book_outlined,
+              color: Colors.blue,
+              onTap: () => _generateWithLoading('comprehensive_guide'),
+              hasSubOptions: false,
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Flashcards Card
+            _buildSimpleCard(
+              context,
+              title: 'Flashcards',
+              subtitle: 'Create interactive cards for quick review',
+              icon: Icons.style_outlined,
+              color: Colors.orange,
+              onTap: () => _showFlashcardOptions(),
+              hasSubOptions: true,
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Quiz Card
+            _buildSimpleCard(
+              context,
+              title: 'Practice Quiz',
+              subtitle: 'Test your knowledge with custom questions',
+              icon: Icons.quiz_outlined,
+              color: Colors.green,
+              onTap: () => _showQuizOptions(),
+              hasSubOptions: true,
+            ),
+            
+            const SizedBox(height: 24),
+            
+            if (_isGenerating)
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
                   children: [
-                    Expanded(
-                      child: InkWell(
-                        onTap: () async {
-                          Navigator.pop(context);
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => StudyGuidesListPage(
-                                lectureId: widget.lectureId,
-                                lectureName: widget.lectureName,
-                              ),
-                            ),
-                          );
-                          
-                          if (result == 'generate' && mounted) {
-                            widget.performAiAction(widget.text, 'comprehensive_guide');
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[800],
-                            borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(16),
-                            ),
-                          ),
-                          child: Center(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.history, size: 18, color: Colors.white70),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'View Saved',
-                                  style: TextStyle(
-                                    color: Colors.grey[200],
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).primaryColor,
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.pop(context);
-                          widget.performAiAction(widget.text, 'comprehensive_guide');
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0),
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: const BorderRadius.only(
-                              bottomRight: Radius.circular(16),
-                            ),
-                          ),
-                          child: const Center(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.add, size: 18, color: Colors.white),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Generate New',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                    const SizedBox(width: 16),
+                    Text(
+                      'Generating your study materials...',
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 16),
-          const Divider(color: Colors.grey),
-          const SizedBox(height: 16),
-          
-          // Flashcards
-          Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              color: Colors.amber.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.amber.withOpacity(0.3)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.style_outlined, 
-                        color: Colors.amber,
-                        size: 28,
-                      ),
-                      const SizedBox(width: 12),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Flashcards',
-                              style: TextStyle(
-                                fontSize: 18, 
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Create flashcards for studying key concepts',
-                              style: TextStyle(fontSize: 14, color: Colors.grey),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Row(
-                    children: [
-                      const Text('Number of cards:', style: TextStyle(color: Colors.white)),
-                      Expanded(
-                        child: SliderTheme(
-                          data: SliderTheme.of(context).copyWith(
-                            overlayShape: SliderComponentShape.noOverlay,
-                            trackHeight: 4.0,
-                            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8.0),
-                            activeTrackColor: Colors.amber,
-                            inactiveTrackColor: Colors.amber.withOpacity(0.2),
-                            thumbColor: Colors.amber,
-                          ),
-                          child: Slider(
-                            value: flashcardCount.toDouble(),
-                            min: 5,
-                            max: 50,
-                            divisions: 45,
-                            label: flashcardCount.toString(),
-                            onChanged: (value) {
-                              setState(() {
-                                flashcardCount = value.toInt();
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 30,
-                        alignment: Alignment.center,
-                        child: Text(
-                          flashcardCount.toString(),
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.amber,
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        widget.performAiAction(widget.text, 'flashcards', questionCount: flashcardCount);
-                      },
-                      child: const Text('Generate Flashcards', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 16),
-          const Divider(color: Colors.grey),
-          const SizedBox(height: 16),
-          
-          // Quiz Generator
-          Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.green.withOpacity(0.3)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.quiz_outlined, 
-                        color: Colors.green,
-                        size: 28,
-                      ),
-                      const SizedBox(width: 12),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Quiz Generator',
-                              style: TextStyle(
-                                fontSize: 18, 
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Create practice questions based on content',
-                              style: TextStyle(fontSize: 14, color: Colors.grey),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: Text('Select quiz type:', style: TextStyle(color: Colors.white)),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Wrap(
-                    spacing: 8.0,
-                    children: [
-                      _buildQuizTypeChip('Mixed', 'mixed', selectedQuizType, 
-                        () => setState(() => selectedQuizType = 'mixed')
-                      ),
-                      _buildQuizTypeChip('Long/Short Response', 'long_response', selectedQuizType, 
-                        () => setState(() => selectedQuizType = 'long_response')
-                      ),
-                      _buildQuizTypeChip('True/False', 'true_false', selectedQuizType, 
-                        () => setState(() => selectedQuizType = 'true_false')
-                      ),
-                      _buildQuizTypeChip('Multiple Choice', 'multiple_choice', selectedQuizType, 
-                        () => setState(() => selectedQuizType = 'multiple_choice')
-                      ),
-                      _buildQuizTypeChip('Fill in the Blank', 'fill_blank', selectedQuizType, 
-                        () => setState(() => selectedQuizType = 'fill_blank')
-                      ),
-                    ],
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: Text('Select difficulty:', style: TextStyle(color: Colors.white)),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Wrap(
-                    spacing: 8.0,
-                    children: [
-                      _buildDifficultyChip('Easy', 'easy', selectedDifficulty, 
-                        () => setState(() => selectedDifficulty = 'easy')
-                      ),
-                      _buildDifficultyChip('Medium', 'medium', selectedDifficulty, 
-                        () => setState(() => selectedDifficulty = 'medium')
-                      ),
-                      _buildDifficultyChip('Hard', 'hard', selectedDifficulty, 
-                        () => setState(() => selectedDifficulty = 'hard')
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: Row(
-                    children: [
-                      const Text('Number of questions:', style: TextStyle(color: Colors.white)),
-                      Expanded(
-                        child: SliderTheme(
-                          data: SliderTheme.of(context).copyWith(
-                            overlayShape: SliderComponentShape.noOverlay,
-                            trackHeight: 4.0,
-                            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8.0),
-                            activeTrackColor: Colors.green,
-                            inactiveTrackColor: Colors.green.withOpacity(0.2),
-                            thumbColor: Colors.green,
-                          ),
-                          child: Slider(
-                            value: questionCount.toDouble(),
-                            min: 5,
-                            max: 50,
-                            divisions: 45,
-                            label: questionCount.toString(),
-                            onChanged: (value) {
-                              setState(() {
-                                questionCount = value.toInt();
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 30,
-                        alignment: Alignment.center,
-                        child: Text(
-                          questionCount.toString(),
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        widget.performAiAction(widget.text, 'questions', 
-                          questionCount: questionCount,
-                          quizType: selectedQuizType,
-                          difficulty: selectedDifficulty
-                        );
-                      },
-                      child: const Text('Generate Quiz', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-        ],
+              ),
+          ],
+        ),
       ),
     );
   }
-  
-  Widget _buildQuizTypeChip(String label, String value, String selectedValue, VoidCallback onTap) {
-    final isSelected = value == selectedValue;
-    return ChoiceChip(
-      label: Text(label, style: TextStyle(
-        color: isSelected ? Colors.blue : Colors.white,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      )),
-      selected: isSelected,
-      onSelected: (selected) {
-        if (selected) onTap();
-      },
-      backgroundColor: Colors.grey[800],
-      selectedColor: Colors.blue.withOpacity(0.2),
+
+  Widget _buildSimpleCard(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+    required bool hasSubOptions,
+  }) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                hasSubOptions ? Icons.tune : Icons.arrow_forward_ios,
+                color: Colors.grey[400],
+                size: hasSubOptions ? 24 : 16,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
-  
-  Widget _buildDifficultyChip(String label, String value, String selectedValue, VoidCallback onTap) {
-    final isSelected = value == selectedValue;
-    Color chipColor;
+
+  void _showFlashcardOptions() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(Icons.style_outlined, color: Colors.orange),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Flashcard Options',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Number of Cards',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Slider(
+                  value: flashcardCount.toDouble(),
+                  min: 5,
+                  max: 25,
+                  divisions: 20,
+                  label: '$flashcardCount cards',
+                  onChanged: (value) {
+                    setState(() {
+                      flashcardCount = value.toInt();
+                    });
+                  },
+                ),
+                Text(
+                  '$flashcardCount cards',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Colors.orange,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _generateWithLoading('flashcards', count: flashcardCount);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Generate Flashcards',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showQuizOptions() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(Icons.quiz_outlined, color: Colors.green),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Quiz Options',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                
+                // Question Count
+                Text(
+                  'Number of Questions',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Slider(
+                  value: questionCount.toDouble(),
+                  min: 5,
+                  max: 20,
+                  divisions: 15,
+                  label: '$questionCount questions',
+                  onChanged: (value) {
+                    setState(() {
+                      questionCount = value.toInt();
+                    });
+                  },
+                ),
+                Text(
+                  '$questionCount questions',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Colors.green,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                
+                const SizedBox(height: 16),
+                
+                // Difficulty
+                Text(
+                  'Difficulty Level',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    _buildDifficultyChip('Easy', 'easy', setState),
+                    const SizedBox(width: 8),
+                    _buildDifficultyChip('Medium', 'medium', setState),
+                    const SizedBox(width: 8),
+                    _buildDifficultyChip('Hard', 'hard', setState),
+                  ],
+                ),
+                
+                const SizedBox(height: 16),
+                
+                // Question Type
+                Text(
+                  'Question Type',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _buildQuizTypeChip('Mixed', 'mixed', setState),
+                    _buildQuizTypeChip('Multiple Choice', 'multiple_choice', setState),
+                    _buildQuizTypeChip('True/False', 'true_false', setState),
+                    _buildQuizTypeChip('Short Answer', 'long_response', setState),
+                  ],
+                ),
+                
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _generateWithLoading('questions');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Generate Quiz',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDifficultyChip(String label, String value, StateSetter setState) {
+    final isSelected = selectedDifficulty == value;
+    Color chipColor = value == 'easy' ? Colors.green : 
+                     value == 'hard' ? Colors.red : Colors.orange;
     
-    switch (value) {
-      case 'easy':
-        chipColor = Colors.green;
-        break;
-      case 'hard':
-        chipColor = Colors.red;
-        break;
-      case 'medium':
-      default:
-        chipColor = Colors.orange;
-        break;
-    }
-    
-    return ChoiceChip(
-      label: Text(label, style: TextStyle(
-        color: isSelected ? chipColor : Colors.white,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      )),
+    return FilterChip(
+      label: Text(label),
       selected: isSelected,
       onSelected: (selected) {
-        if (selected) onTap();
+        setState(() {
+          selectedDifficulty = value;
+        });
       },
-      backgroundColor: Colors.grey[800],
       selectedColor: chipColor.withOpacity(0.2),
+      checkmarkColor: chipColor,
+      labelStyle: TextStyle(
+        color: isSelected ? chipColor : null,
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      ),
     );
+  }
+
+  Widget _buildQuizTypeChip(String label, String value, StateSetter setState) {
+    final isSelected = selectedQuizType == value;
+    
+    return FilterChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (selected) {
+        setState(() {
+          selectedQuizType = value;
+        });
+      },
+      selectedColor: Colors.green.withOpacity(0.2),
+      checkmarkColor: Colors.green,
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.green : null,
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      ),
+    );
+  }
+
+  void _generateWithLoading(String action, {int? count}) async {
+    setState(() {
+      _isGenerating = true;
+    });
+
+    try {
+      Navigator.pop(context);
+      if (action == 'flashcards') {
+        widget.performAiAction(widget.text, action, questionCount: count ?? flashcardCount);
+      } else if (action == 'questions') {
+        widget.performAiAction(
+          widget.text, 
+          action,
+          questionCount: questionCount,
+          quizType: selectedQuizType,
+          difficulty: selectedDifficulty,
+        );
+      } else {
+        widget.performAiAction(widget.text, action);
+      }
+    } finally {
+      setState(() {
+        _isGenerating = false;
+      });
+    }
   }
 }
 
-// This is a placeholder - you'll need to use your actual StudyGuidesListPage
+// Simplified placeholder for study guides
 class StudyGuidesListPage extends StatelessWidget {
   final String lectureId;
   final String lectureName;
@@ -511,31 +538,38 @@ class StudyGuidesListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text('Study Guides for $lectureName', style: const TextStyle(color: Colors.white)),
-        backgroundColor: Colors.black,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        title: Text('Study Guides'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'No saved study guides yet',
-              style: TextStyle(color: Colors.white, fontSize: 18),
+            Icon(
+              Icons.menu_book_outlined,
+              size: 64,
+              color: Colors.grey[400],
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
+            const SizedBox(height: 16),
+            Text(
+              'No saved study guides yet',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Colors.grey[600],
               ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
               onPressed: () {
                 Navigator.pop(context, 'generate');
               },
-              child: const Text('Generate New Study Guide'),
+              icon: const Icon(Icons.add),
+              label: const Text('Generate New Study Guide'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
             ),
           ],
         ),

@@ -2,3 +2,11 @@ flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/icons/logo.png"
+  min_sdk_android: 21
+  background_color: "#00000000"  # Fully transparent background
+  remove_alpha_ios: false
+  web:
+    generate: true
+    image_path: "assets/icons/logo.png"
+    background_color: "#00000000"  # Fully transparent background
+    theme_color: "#00000000"  # Fully transparent background
